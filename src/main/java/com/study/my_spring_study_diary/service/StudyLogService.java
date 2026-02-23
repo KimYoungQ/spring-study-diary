@@ -1,6 +1,6 @@
 package com.study.my_spring_study_diary.service;
 
-import com.study.my_spring_study_diary.common.Page;
+import com.study.my_spring_study_diary.global.common.Page;
 import com.study.my_spring_study_diary.dao.StudyLogDao;
 import com.study.my_spring_study_diary.dto.request.StudyLogCreateRequest;
 import com.study.my_spring_study_diary.dto.request.StudyLogUpdateRequest;

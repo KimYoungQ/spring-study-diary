@@ -1,10 +1,9 @@
 package com.study.my_spring_study_diary.dao;
 
-import com.study.my_spring_study_diary.common.Page;
+import com.study.my_spring_study_diary.global.common.Page;
 import com.study.my_spring_study_diary.entity.Category;
 import com.study.my_spring_study_diary.entity.StudyLog;
 import com.study.my_spring_study_diary.entity.Understanding;
-import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;

@@ -1,4 +1,4 @@
-package com.study.my_spring_study_diary.common;
+package com.study.my_spring_study_diary.global.common;
 
 import java.util.List;
 

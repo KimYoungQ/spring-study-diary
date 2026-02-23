@@ -1,16 +1,13 @@
 package com.study.my_spring_study_diary.controller;
 
-import com.study.my_spring_study_diary.common.Page;
+import com.study.my_spring_study_diary.global.common.Page;
 import com.study.my_spring_study_diary.dto.request.StudyLogCreateRequest;
 import com.study.my_spring_study_diary.dto.request.StudyLogUpdateRequest;
 import com.study.my_spring_study_diary.dto.response.StudyLogDeleteResponse;
 import com.study.my_spring_study_diary.dto.response.StudyLogResponse;
-import com.study.my_spring_study_diary.entity.StudyLog;
 import com.study.my_spring_study_diary.service.StudyLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;

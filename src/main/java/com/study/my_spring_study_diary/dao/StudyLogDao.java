@@ -1,7 +1,6 @@
 package com.study.my_spring_study_diary.dao;
 
-import com.study.my_spring_study_diary.common.Page;
-import com.study.my_spring_study_diary.entity.Category;
+import com.study.my_spring_study_diary.global.common.Page;
 import com.study.my_spring_study_diary.entity.StudyLog;
 
 import java.time.LocalDate;

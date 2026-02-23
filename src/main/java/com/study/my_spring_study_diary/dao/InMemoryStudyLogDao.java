@@ -1,12 +1,8 @@
 package com.study.my_spring_study_diary.dao;
 
-import com.study.my_spring_study_diary.common.Page;
+import com.study.my_spring_study_diary.global.common.Page;
 import com.study.my_spring_study_diary.entity.Category;
 import com.study.my_spring_study_diary.entity.StudyLog;
-import com.study.my_spring_study_diary.exception.InvalidPageRequestException;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 
