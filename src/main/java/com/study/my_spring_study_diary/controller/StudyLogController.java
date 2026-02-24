@@ -1,5 +1,6 @@
 package com.study.my_spring_study_diary.controller;
 
+import com.study.my_spring_study_diary.global.common.ApiResponse;
 import com.study.my_spring_study_diary.global.common.Page;
 import com.study.my_spring_study_diary.dto.request.StudyLogCreateRequest;
 import com.study.my_spring_study_diary.dto.request.StudyLogUpdateRequest;
@@ -8,6 +9,8 @@ import com.study.my_spring_study_diary.dto.response.StudyLogResponse;
 import com.study.my_spring_study_diary.service.StudyLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -41,9 +44,12 @@ public class StudyLogController {
      * POST /api/v1/logs
      */
     @PostMapping
-    public StudyLogResponse createStudyLog(@RequestBody StudyLogCreateRequest request) {
+    public ResponseEntity<ApiResponse<StudyLogResponse>>  createStudyLog(@RequestBody StudyLogCreateRequest request) {
+
         //Service 호출하여 학습 일지 생성
-        return studyLogService.createStudyLog(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success(studyLogService.createStudyLog(request)));
     }
 
     /**
@@ -54,10 +60,10 @@ public class StudyLogController {
      * GET /api/v1/logs
      */
     @GetMapping
-    public List<StudyLogResponse> getAllStudyLogs() {
+    public ResponseEntity<ApiResponse<List<StudyLogResponse>>>  getAllStudyLogs() {
 
         // Service 호출하여 모든 학습 일지 조회
-        return studyLogService.getAllStudyLogs();
+        return ResponseEntity.ok(ApiResponse.success(studyLogService.getAllStudyLogs()));
     }
 
     /**
@@ -69,8 +75,9 @@ public class StudyLogController {
      * GET /api/v1/logs/{id}
      */
     @GetMapping("/{id}")
-    public StudyLogResponse getStudyLogById(@PathVariable Long id) {
-        return studyLogService.getStudyLogById(id);
+    public ResponseEntity<ApiResponse<StudyLogResponse>> getStudyLogById(@PathVariable Long id) {
+
+        return ResponseEntity.ok(ApiResponse.success(studyLogService.getStudyLogById(id)));
     }
 
     /**
@@ -83,11 +90,12 @@ public class StudyLogController {
      * 예시: GET /api/v1/logs/date/2025-01-15
      */
     @GetMapping("/date/{date}")
-    public List<StudyLogResponse> getStudyLogByDate(
+    public ResponseEntity<ApiResponse<List<StudyLogResponse>>> getStudyLogByDate(
             @PathVariable
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate date) {
-        return studyLogService.getStudyLogsByDate(date);
+
+        return ResponseEntity.ok(ApiResponse.success(studyLogService.getStudyLogsByDate(date)));
     }
 
     /**
@@ -101,8 +109,9 @@ public class StudyLogController {
      * GET /api/v1/logs/category/JAVA
      */
     @GetMapping("/category/{category}")
-    public List<StudyLogResponse> getStudyLogsByCategory(@PathVariable String category) {
-        return studyLogService.getStudyLogsByCategory(category);
+    public ResponseEntity<ApiResponse<List<StudyLogResponse>>> getStudyLogsByCategory(@PathVariable String category) {
+
+        return ResponseEntity.ok(ApiResponse.success(studyLogService.getStudyLogsByCategory(category)));
     }
 
     // ========== PAGING ==========
@@ -118,10 +127,11 @@ public class StudyLogController {
      * @return 페이징된 학습 일지
      */
     @GetMapping("/page")
-    public Page<StudyLogResponse> getStudyLogsPage(
+    public ResponseEntity<ApiResponse<Page<StudyLogResponse>>> getStudyLogsPage(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return studyLogService.getStudyLogsWithPaging(page, size);
+
+        return ResponseEntity.ok(ApiResponse.success(studyLogService.getStudyLogsWithPaging(page, size)));
     }
 
     /**
@@ -135,12 +145,12 @@ public class StudyLogController {
      * @return 페이징된 학습 일지
      */
     @GetMapping("/category/{category}/page")
-    public Page<StudyLogResponse> getStudyLogsByCategoryPage(
+    public ResponseEntity<ApiResponse<Page<StudyLogResponse>>> getStudyLogsByCategoryPage(
             @PathVariable String category,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        return studyLogService.getStudyLogsByCategoryWithPaging(category, page, size);
+        return ResponseEntity.ok(ApiResponse.success(studyLogService.getStudyLogsByCategoryWithPaging(category, page, size)));
     }
 
     /**
@@ -159,7 +169,7 @@ public class StudyLogController {
      * @return 페이징된 검색 결과
      */
     @GetMapping("/search")
-    public Page<StudyLogResponse> searchStudyLogs(
+    public ResponseEntity<ApiResponse<Page<StudyLogResponse>>> searchStudyLogs(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String category,
             @RequestParam(required = false)
@@ -169,8 +179,8 @@ public class StudyLogController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        return studyLogService.searchStudyLogsWithPaging(
-                title, category, startDate, endDate, page, size);
+        return ResponseEntity.ok(ApiResponse.success(studyLogService.searchStudyLogsWithPaging(
+                title, category, startDate, endDate, page, size)));
     }
 
     // ========== UPDATE ==========
@@ -187,12 +197,11 @@ public class StudyLogController {
      */
     @PutMapping("/{id}")
 
-    public StudyLogResponse updateStudyLog(
+    public ResponseEntity<ApiResponse<StudyLogResponse>> updateStudyLog(
             @PathVariable Long id,
             @RequestBody StudyLogUpdateRequest request) {
-        StudyLogResponse response = studyLogService.updateStudyLog(id, request);
 
-        return response;
+        return ResponseEntity.ok(ApiResponse.success(studyLogService.updateStudyLog(id, request)));
     }
 
     // ========== DELETE ==========
@@ -206,7 +215,8 @@ public class StudyLogController {
      * @return 삭제 결과
      */
     @DeleteMapping("/{id}")
-    public StudyLogDeleteResponse deleteStudyLog(@PathVariable Long id) {
-        return studyLogService.deleteStudyLog(id);
+    public ResponseEntity<ApiResponse<StudyLogDeleteResponse>> deleteStudyLog(@PathVariable Long id) {
+
+        return ResponseEntity.ok(ApiResponse.success(studyLogService.deleteStudyLog(id)));
     }
 }

@@ -81,7 +81,7 @@ Content-Type: {{contentType}}
 GET {{baseUrl}}/api/v1/logs
 
 ### 2-2. ID로 특정 학습 일지 조회
-GET {{baseUrl}}/api/v1/logs/2
+GET {{baseUrl}}/api/v1/logs/99
 
 ### 2-3. 날짜별 학습 일지 조회
 GET {{baseUrl}}/api/v1/logs/date/2026-02-05

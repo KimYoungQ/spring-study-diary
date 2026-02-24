@@ -1,5 +1,6 @@
 package com.study.my_spring_study_diary.service;
 
+import com.study.my_spring_study_diary.exception.ResourceNotFoundException;
 import com.study.my_spring_study_diary.global.common.Page;
 import com.study.my_spring_study_diary.dao.StudyLogDao;
 import com.study.my_spring_study_diary.dto.request.StudyLogCreateRequest;
@@ -82,10 +83,10 @@ public class StudyLogService {
      * ID로 학습 일지 단건 조회
      */
     public StudyLogResponse getStudyLogById(Long id) {
-        StudyLog studyLog = studyLogDao.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 학습 일지를 찾을 수 없습니다. (id: " + id + ")"));
 
-        return StudyLogResponse.from(studyLog);
+        return studyLogDao.findById(id)
+                .map(StudyLogResponse::from)
+                .orElseThrow(() -> new ResourceNotFoundException("ID", id));
     }
 
     /**
