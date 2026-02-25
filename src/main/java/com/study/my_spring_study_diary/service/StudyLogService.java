@@ -10,6 +10,7 @@ import com.study.my_spring_study_diary.dto.response.StudyLogResponse;
 import com.study.my_spring_study_diary.entity.Category;
 import com.study.my_spring_study_diary.entity.StudyLog;
 import com.study.my_spring_study_diary.entity.Understanding;
+import com.study.my_spring_study_diary.mapper.StudyLogMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ public class StudyLogService {
 
     // 의존성 주입: Repository를 주입받음
     private final StudyLogDao studyLogDao;
+    private final StudyLogMapper studyLogMapper;
 
     // 페이징 관련 상수
     private static final int DEFAULT_PAGE_SIZE = 10;
@@ -52,14 +54,15 @@ public class StudyLogService {
         validateCreateRequest(request);
 
         // 2. DTO → Entity 변환 (Using Builder pattern with Lombok)
-        StudyLog studyLog = request.toEntity();
+        // Using MapStruct로 변경
+        StudyLog studyLog = studyLogMapper.toEntity(request);
 
         // 3. 저장 (DAO 사용)
         StudyLog savedStudyLog = studyLogDao.save(studyLog);
         log.info("Successfully created study log with ID: {}", savedStudyLog.getId());
 
         // 4. Entity → Response DTO 변환 후 반환
-        return StudyLogResponse.from(savedStudyLog);
+        return studyLogMapper.toResponse(savedStudyLog);
     }
 
     /**
@@ -223,7 +226,7 @@ public class StudyLogService {
         validateUpdateRequest(request);
 
         // 4. 업데이트
-        studyLog.update(request);
+        studyLogMapper.partialUpdate(request, studyLog);
 
         // 5. 저장 및 응답 반환
         StudyLog updatedStudying = studyLogDao.update(studyLog);

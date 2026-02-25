@@ -1,9 +1,16 @@
 package com.study.my_spring_study_diary.dto.response;
 
 import com.study.my_spring_study_diary.entity.StudyLog;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Setter;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@AllArgsConstructor
+@Builder
+@Setter
 public class StudyLogResponse {
     private Long id;
     private String title;

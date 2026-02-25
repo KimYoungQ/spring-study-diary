@@ -43,49 +43,67 @@ public class StudyLog {
         this.updatedAt = LocalDateTime.now();
     }
 
-    /**
-     * 학습 일지 정보 수정
-     * <p>
-     * null이 아닌 값만 업데이트합니다.
-     * 이 방식을 "Dirty Checking" 또는 "Partial Update"라고 합니다.
-     */
-    public void update(StudyLogUpdateRequest studyLogUpdateRequest) {
-        Optional.ofNullable(studyLogUpdateRequest.getTitle()).ifPresent(this::setTitle);
-        Optional.ofNullable(studyLogUpdateRequest.getContent()).ifPresent(this::setContent);
-        Optional.ofNullable(studyLogUpdateRequest.getCategory())
-                .map(String::toUpperCase)
-                .map(Category::valueOf)
-                .ifPresent(this::setCategory);
-        Optional.ofNullable(studyLogUpdateRequest.getCategory())
-                .map(String::toUpperCase)
-                .map(Category::valueOf)
-                .ifPresent(this::setCategory);
-        Optional.ofNullable(studyLogUpdateRequest.getStudyTime()).ifPresent(this::setStudyTime);
-        Optional.ofNullable(studyLogUpdateRequest.getStudyDate()).ifPresent(this::setStudyDate);
 
+    /**
+     * Update study log information
+     * Only updates non-null values (Partial Update)
+     */
+    public void update(String title, String content, Category category,
+                       Understanding understanding, Integer studyTime, LocalDate studyDate) {
+
+        if (title != null) {
+            this.title = title;
+        }
+        if (content != null) {
+            this.content = content;
+        }
+        if (category != null) {
+            this.category = category;
+        }
+        if (understanding != null) {
+            this.understanding = understanding;
+        }
+        if (studyTime != null) {
+            this.studyTime = studyTime;
+        }
+        if (studyDate != null) {
+            this.studyDate = studyDate;
+        }
+
+        // Update modification time
         this.updatedAt = LocalDateTime.now();
     }
 
-    // Getter 메서드들
-    public Long getId() { return id; }
-    public String getTitle() { return title; }
-    public String getContent() { return content; }
-    public Category getCategory() { return category; }
-    public Understanding getUnderstanding() { return understanding; }
-    public Integer getStudyTime() { return studyTime; }
-    public LocalDate getStudyDate() { return studyDate; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
 
-    // Setter 메서드들
-    public void setId(Long id) { this.id = id; }
-    public void setTitle(String title) { this.title = title; }
-    public void setContent(String content) { this.content = content; }
-    public void setCategory(Category category) { this.category = category; }
-    public void setUnderstanding(Understanding understanding) { this.understanding = understanding; }
-    public void setStudyTime(Integer studyTime) { this.studyTime = studyTime; }
-    public void setStudyDate(LocalDate studyDate) { this.studyDate = studyDate; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    // Individual update methods for MapStruct
+    public void updateTitle(String title) {
+        this.title = title;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateCategory(Category category) {
+        this.category = category;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateUnderstanding(Understanding understanding) {
+        this.understanding = understanding;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateStudyTime(Integer studyTime) {
+        this.studyTime = studyTime;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateStudyDate(LocalDate studyDate) {
+        this.studyDate = studyDate;
+        this.updatedAt = LocalDateTime.now();
+    }
 }
 
