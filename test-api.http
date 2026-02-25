@@ -13,10 +13,10 @@ POST {{baseUrl}}/api/v1/logs
 Content-Type: {{contentType}}
 
 {
-  "title": "Spring Boot 기초 학습",
+  "title": "S",
   "content": "Spring Boot의 기본 구조와 어노테이션에 대해 학습했습니다.",
-  "category": "SPRING",
-  "understanding": "VERY_GOOD",
+  "category": "SPRING1",
+  "understanding": "VERY_GOOD2",
   "studyTime": 120,
   "studyDate": "2026-02-05"
 }

@@ -2,13 +2,7 @@
 server:
   port: 8081
   servlet:
-    context-path: /
-    encoding:
-      charset: UTF-8
-      enabled: true
-      force: true
-
-# Spring 설정      
+    context-path:
 spring:
   application:
     name: my-spring-study-diary
@@ -32,6 +26,11 @@ spring:
       mode: always
       platform: mysql
       encoding: UTF-8
+
+  # Validation
+  messages:
+    basename: messages/validation
+    encoding: UTF-8
 
 # 로깅 설정
 logging:

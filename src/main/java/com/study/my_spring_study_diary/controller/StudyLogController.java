@@ -7,6 +7,9 @@ import com.study.my_spring_study_diary.dto.request.StudyLogUpdateRequest;
 import com.study.my_spring_study_diary.dto.response.StudyLogDeleteResponse;
 import com.study.my_spring_study_diary.dto.response.StudyLogResponse;
 import com.study.my_spring_study_diary.service.StudyLogService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -44,7 +47,8 @@ public class StudyLogController {
      * POST /api/v1/logs
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<StudyLogResponse>>  createStudyLog(@RequestBody StudyLogCreateRequest request) {
+    public ResponseEntity<ApiResponse<StudyLogResponse>>  createStudyLog(
+            @Valid @RequestBody StudyLogCreateRequest request) {
 
         //Service 호출하여 학습 일지 생성
         return ResponseEntity
@@ -75,7 +79,8 @@ public class StudyLogController {
      * GET /api/v1/logs/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<StudyLogResponse>> getStudyLogById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<StudyLogResponse>> getStudyLogById(
+            @PathVariable @Positive(message = "ID는 양수여야 합니다") Long id) {
 
         return ResponseEntity.ok(ApiResponse.success(studyLogService.getStudyLogById(id)));
     }
@@ -128,8 +133,8 @@ public class StudyLogController {
      */
     @GetMapping("/page")
     public ResponseEntity<ApiResponse<Page<StudyLogResponse>>> getStudyLogsPage(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "0") @Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다") int page,
+            @RequestParam(defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다") int size) {
 
         return ResponseEntity.ok(ApiResponse.success(studyLogService.getStudyLogsWithPaging(page, size)));
     }
@@ -147,8 +152,8 @@ public class StudyLogController {
     @GetMapping("/category/{category}/page")
     public ResponseEntity<ApiResponse<Page<StudyLogResponse>>> getStudyLogsByCategoryPage(
             @PathVariable String category,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "0")  @Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다") int page,
+            @RequestParam(defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다") int size) {
 
         return ResponseEntity.ok(ApiResponse.success(studyLogService.getStudyLogsByCategoryWithPaging(category, page, size)));
     }
@@ -176,8 +181,8 @@ public class StudyLogController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "0") @Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다") int page,
+            @RequestParam(defaultValue = "10") @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다") int size) {
 
         return ResponseEntity.ok(ApiResponse.success(studyLogService.searchStudyLogsWithPaging(
                 title, category, startDate, endDate, page, size)));

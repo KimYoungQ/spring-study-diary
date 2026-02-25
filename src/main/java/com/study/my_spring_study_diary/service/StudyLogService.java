@@ -11,6 +11,7 @@ import com.study.my_spring_study_diary.entity.Category;
 import com.study.my_spring_study_diary.entity.StudyLog;
 import com.study.my_spring_study_diary.entity.Understanding;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
  * - @Component와 기능적으로 동일하지만, 역할을 명확히 표현합니다
  */
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StudyLogService {
@@ -44,23 +46,17 @@ public class StudyLogService {
      * @return 생성된 학습 일지 응답 DTO
      */
     public StudyLogResponse createStudyLog(StudyLogCreateRequest request) {
+        log.info("Creating study log with title: {}", request.getTitle());
 
         // 1. 요청 데이터 유효성 검증
         validateCreateRequest(request);
 
-        // 2. DTO → Entity 변환
-        StudyLog studyLog = new StudyLog (
-                null,  // ID는 Repository에서 자동 생성
-                request.getTitle(),
-                request.getContent(),
-                Category.valueOf(request.getCategory()),
-                Understanding.valueOf(request.getUnderstanding()),
-                request.getStudyTime(),
-                request.getStudyDate() != null ? request.getStudyDate() : LocalDate.now()
-        );
+        // 2. DTO → Entity 변환 (Using Builder pattern with Lombok)
+        StudyLog studyLog = request.toEntity();
 
-        // 3. 저장
+        // 3. 저장 (DAO 사용)
         StudyLog savedStudyLog = studyLogDao.save(studyLog);
+        log.info("Successfully created study log with ID: {}", savedStudyLog.getId());
 
         // 4. Entity → Response DTO 변환 후 반환
         return StudyLogResponse.from(savedStudyLog);

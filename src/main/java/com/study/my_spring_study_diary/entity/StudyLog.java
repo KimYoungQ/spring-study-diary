@@ -2,11 +2,17 @@ package com.study.my_spring_study_diary.entity;
 
 
 import com.study.my_spring_study_diary.dto.request.StudyLogUpdateRequest;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class StudyLog {
 
     private Long id;
@@ -16,12 +22,12 @@ public class StudyLog {
     private Understanding understanding;
     private Integer studyTime;
     private LocalDate studyDate;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
-    // 기본 생성자
-    public StudyLog() {
-    }
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Builder.Default
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     // 전체 필드 생성자
     public StudyLog(Long id, String title, String content, Category category,
