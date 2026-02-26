@@ -103,7 +103,7 @@ GET {{baseUrl}}/api/v1/logs/category/DATABASE
 GET {{baseUrl}}/api/v1/logs/page
 
 ### 3-2. 페이징 조회 - 페이지 지정 (page=0, size=5)
-GET {{baseUrl}}/api/v1/logs/page?page=1&size=2
+GET {{baseUrl}}/api/v1/logs/page?page=3&size=2
 
 ### 3-3. 페이징 조회 - 두 번째 페이지 (page=1, size=5)
 GET {{baseUrl}}/api/v1/logs/page?page=-1&size=5

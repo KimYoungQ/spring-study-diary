@@ -1,16 +1,15 @@
 package com.study.my_spring_study_diary.exception;
 
-public class InvalidPageRequestException extends RuntimeException {
+import com.study.my_spring_study_diary.global.exception.BusinessException;
+import com.study.my_spring_study_diary.global.exception.ErrorCode;
 
-    private final int requestedPage;
-    private final int totalPages;
+public class InvalidPageRequestException extends BusinessException {
 
     public InvalidPageRequestException(int requestedPage, int totalPages) {
-        super(String.format(
-                "잘못된 페이지 요청입니다. 요청 페이지: %d, 전체 피이지: %d (0~%d)",
+        super(ErrorCode.INVALID_PAGE,
+                String.format(
+                "잘못된 페이지 요청입니다. 요청 페이지: %d, 전체 페이지: %d (0~%d)",
                 requestedPage, totalPages, totalPages -1
         ));
-        this.requestedPage = requestedPage;
-        this.totalPages = totalPages;
     }
 }

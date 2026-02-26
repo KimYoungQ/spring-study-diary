@@ -1,5 +1,6 @@
 package com.study.my_spring_study_diary.service;
 
+import com.study.my_spring_study_diary.exception.InvalidPageRequestException;
 import com.study.my_spring_study_diary.exception.ResourceNotFoundException;
 import com.study.my_spring_study_diary.global.common.Page;
 import com.study.my_spring_study_diary.dao.StudyLogDao;
@@ -118,11 +119,16 @@ public class StudyLogService {
      * 페이징 처리된 학습 일지 목록 조회
      */
     public Page<StudyLogResponse> getStudyLogsWithPaging(int page, int size) {
+
         // 파라미터 유효성 검증
-        page = Math.max(0, page);  // 음수 방지
         size = Math.min(Math.max(1, size), MAX_PAGE_SIZE);  // 1~100 범위
 
         Page<StudyLog> studyLogPage = studyLogDao.findAllWithPaging(page, size);
+
+        // 요청 페이지 범위 검증
+        if (page < 0 || page >= studyLogPage.getTotalPages()) {
+            throw new InvalidPageRequestException(page, studyLogPage.getTotalPages());
+        }
 
         //Entity를 Response DTO로 변환
         List<StudyLogResponse> content = studyLogPage.getContent().stream()
@@ -137,8 +143,8 @@ public class StudyLogService {
      * 카테고리별 페이징 조회
      */
     public Page<StudyLogResponse> getStudyLogsByCategoryWithPaging(String categoryStr, int page, int size) {
+
         // 파라미터 유효성 검증
-        page = Math.max(0, page);  // 음수 방지
         size = Math.min(Math.max(1, size), MAX_PAGE_SIZE);  // 1~100 범위
 
         // 카테고리 유효성 검증
@@ -147,6 +153,11 @@ public class StudyLogService {
         }
 
         Page<StudyLog> studyLogPage = studyLogDao.findByCategoryWithPaging(categoryStr.toUpperCase(), page, size);
+
+        // 요청 페이지 범위 검증
+        if (page < 0 || page >= studyLogPage.getTotalPages()) {
+            throw new InvalidPageRequestException(page, studyLogPage.getTotalPages());
+        }
 
         List<StudyLogResponse> content = studyLogPage.getContent().stream()
                 .map(studyLogMapper::toResponse)
