@@ -11,9 +11,11 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -31,9 +33,11 @@ import java.util.List;
  * - 모든 메서드의 URL 앞에 "/api/v1/logs"가 붙음
  */
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/logs")
 @RequiredArgsConstructor
+@Validated
 public class StudyLogController {
 
     private final StudyLogService studyLogService;
