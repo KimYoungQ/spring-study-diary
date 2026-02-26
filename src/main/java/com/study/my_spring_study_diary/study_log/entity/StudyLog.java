@@ -1,0 +1,61 @@
+package com.study.my_spring_study_diary.study_log.entity;
+
+
+import lombok.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class StudyLog {
+
+    private Long id;
+    private String title;
+    private String content;
+    private Category category;
+    private Understanding understanding;
+    private Integer studyTime;
+    private LocalDate studyDate;
+
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Builder.Default
+    private LocalDateTime updatedAt = LocalDateTime.now();
+
+    // Individual update methods for MapStruct
+    public void updateTitle(String title) {
+        this.title = title;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateCategory(Category category) {
+        this.category = category;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateUnderstanding(Understanding understanding) {
+        this.understanding = understanding;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateStudyTime(Integer studyTime) {
+        this.studyTime = studyTime;
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public void updateStudyDate(LocalDate studyDate) {
+        this.studyDate = studyDate;
+        this.updatedAt = LocalDateTime.now();
+    }
+}
+
