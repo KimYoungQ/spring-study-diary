@@ -184,17 +184,15 @@ public class StudyLogService {
             int page,
             int size) {
 
-        page = Math.max(0, page);
         size = Math.min(Math.max(1, size), MAX_PAGE_SIZE);
 
-        // 카테고리 문자열을 대문자로 변환 (유효성 검증은 DAO에서 처리)
-        String category = null;
-        if (categoryStr != null && !categoryStr.isBlank()) {
-            category = categoryStr.toUpperCase();
-        }
-
         Page<StudyLog> studyLogPage = studyLogDao.searchWithPaging(
-                titleKeyword, category, startDate, endDate, page, size);
+                titleKeyword, categoryStr, startDate, endDate, page, size);
+
+        // 요청 페이지 범위 검증
+        if (page < 0 || page >= studyLogPage.getTotalPages()) {
+            throw new InvalidPageRequestException(page, studyLogPage.getTotalPages());
+        }
 
         List<StudyLogResponse> content = studyLogPage.getContent().stream()
                 .map(studyLogMapper::toResponse)
@@ -216,8 +214,7 @@ public class StudyLogService {
 
         // 1. 기존 학습 일지 조회
         StudyLog studyLog = studyLogDao.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "해당 학습 일지를 찾을 수 없습니다. (id: " + id + ")"));
+                .orElseThrow(() -> new ResourceNotFoundException("Study Log", id));
 
         // 2. 수정할 내용이 있는지 확인
         if (request.hasNoUpdates()) {
@@ -237,12 +234,12 @@ public class StudyLogService {
      *
      * @param id 삭제할 학습 일지 ID
      * @return 삭제 결과 응답
-     * @throws StudyLogNotFoundException 해당 ID의 학습 일지가validationStudyLogById 없는 경우
+     * @throws ResourceNotFoundException 해당 ID의 학습 일지가validationStudyLogById 없는 경우
      */
     public StudyLogDeleteResponse deleteStudyLog(Long id) {
-        StudyLog studyLog = studyLogDao.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "해당 학습 일지를 찾을 수 없습니다. (id: " + id + ")"));
+
+        studyLogDao.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Study Log", id));
 
         //2. 삭제 수행
         studyLogDao.deleteById(id);
