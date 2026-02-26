@@ -9,11 +9,7 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Getter
-@Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ToString
 public class StudyLogCreateRequest {
 
     @NotBlank(message = "제목은 필수입니다")
@@ -39,19 +35,4 @@ public class StudyLogCreateRequest {
 
     @PastOrPresent(message = "학습 날짜는 현재 또는 과거여야 합니다")
     private LocalDate studyDate;
-
-
-    /**
-     * Convert to Entity
-     */
-    public StudyLog toEntity() {
-        return StudyLog.builder()
-                .title(this.title)
-                .content(this.content)
-                .category(Category.valueOf(this.category))
-                .understanding(Understanding.valueOf(this.understanding))
-                .studyTime(this.studyTime)
-                .studyDate(this.studyDate != null ? this.studyDate : LocalDate.now())
-                .build();
-    }
 }

@@ -1,5 +1,8 @@
 package com.study.my_spring_study_diary.dto.request;
 
+import com.study.my_spring_study_diary.entity.Category;
+import com.study.my_spring_study_diary.entity.Understanding;
+import com.study.my_spring_study_diary.validation.EnumValid;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -12,11 +15,7 @@ import java.time.LocalDate;
  * null이면 기존 값을 유지합니다.
  */
 @Getter
-@Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ToString
 public class StudyLogUpdateRequest {
 
     @Size(min = 2, max = 100, message = "제목은 2자 이상 100자 이하여야 합니다")
@@ -25,12 +24,10 @@ public class StudyLogUpdateRequest {
     @Size(min = 10, max = 5000, message = "내용은 10자 이상 5000자 이하여야 합니다")
     private String content;        // null means keep existing value
 
-    @Pattern(regexp = "^(JAVA|SPRING|JPA|DATABASE|ALGORITHM|CS|NETWORK|GIT|ETC)$",
-            message = "카테고리는 JAVA, SPRING, JPA, DATABASE, ALGORITHM, CS, NETWORK, GIT, ETC 중 하나여야 합니다")
+    @EnumValid(enumClass = Category.class, message = "카테고리는 JAVA, SPRING, JPA, DATABASE, ALGORITHM, CS, NETWORK, GIT, ETC 중 하나여야 합니다")
     private String category;       // null means keep existing value
 
-    @Pattern(regexp = "^(VERY_GOOD|GOOD|NORMAL|BAD|VERY_BAD)$",
-            message = "이해도는 VERY_GOOD, GOOD, NORMAL, BAD, VERY_BAD 중 하나여야 합니다")
+    @EnumValid(enumClass = Understanding.class, message = "이해도는 VERY_GOOD, GOOD, NORMAL, BAD, VERY_BAD 중 하나여야 합니다")
     private String understanding;  // null means keep existing value
 
     @Positive(message = "학습 시간은 양수여야 합니다")

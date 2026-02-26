@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -71,10 +72,7 @@ public class StudyLogService {
     public List<StudyLogResponse> getAllStudyLogs() {
         List<StudyLog> studyLogs = studyLogDao.findAll();
 
-        //Entity 리스트 -> Response DTO 리스트로 반환
-        return studyLogs.stream()
-                .map(StudyLogResponse::from)
-                .collect(Collectors.toList());
+        return studyLogMapper.toResponseList(studyLogs);
     }
 
 
@@ -83,42 +81,38 @@ public class StudyLogService {
      */
     public StudyLogResponse getStudyLogById(Long id) {
 
-        return studyLogDao.findById(id)
-                .map(StudyLogResponse::from)
-                .orElseThrow(() -> new ResourceNotFoundException("ID", id));
+        // 1. DAO에서 ID로 조회 (Optional 반환)
+        Optional<StudyLog> studyLogOpt = studyLogDao.findById(id);
+
+        // 2. 존재하지 않으면 예외 처리
+        StudyLog studyLog = studyLogOpt.orElseThrow(() -> {
+            log.warn("Study log not found with ID: {}", id);
+            return new ResourceNotFoundException("Study Log", id);
+        });
+
+        // 3. Entity → Response DTO 변환 후 반환 (Using MapStruct)
+        return studyLogMapper.toResponse(studyLog);
     }
 
     /**
      * 날짜별 학습 일지 조회
      */
     public List<StudyLogResponse> getStudyLogsByDate(LocalDate date) {
+
         List<StudyLog> studyLogs = studyLogDao.findByStudyDate(date);
 
-        return studyLogs.stream()
-                .map(StudyLogResponse::from)
-                .collect(Collectors.toList());
+        return studyLogMapper.toResponseList(studyLogs);
     }
 
     /**
      * 카테고리 학습 일지 조회
      */
     public List<StudyLogResponse> getStudyLogsByCategory(String categoryString) {
-        // 1. 문자열을 Category Enum으로 변환
-        Category category;
-        try {
-            category = Category.valueOf(categoryString.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("잘못된 카테고리입니다. 사용 가능한 카테고리: " +
-                    Arrays.toString(Category.values()));
-        }
 
-        // 2. DAO에서 카테고리로 조회
-        List<StudyLog> studyLogs = studyLogDao.findByCategory(category.toString());
+        List<StudyLog> studyLogs = studyLogDao.findByCategory(categoryString);
 
         // 3. Entity 리스트 → Response DTO 리스트 변환
-        return studyLogs.stream()
-                .map(StudyLogResponse::from)
-                .collect(Collectors.toList());
+        return studyLogMapper.toResponseList(studyLogs);
     }
 
     // ========== PAGING ==========
@@ -135,7 +129,7 @@ public class StudyLogService {
 
         //Entity를 Response DTO로 변환
         List<StudyLogResponse> content = studyLogPage.getContent().stream()
-                .map(StudyLogResponse::from)
+                .map(studyLogMapper::toResponse)
                 .collect(Collectors.toList());
 
         // 페이징 정보를 유지하면서 DTO로 변환
@@ -158,7 +152,7 @@ public class StudyLogService {
         Page<StudyLog> studyLogPage = studyLogDao.findByCategoryWithPaging(categoryStr.toUpperCase(), page, size);
 
         List<StudyLogResponse> content = studyLogPage.getContent().stream()
-                .map(StudyLogResponse::from)
+                .map(studyLogMapper::toResponse)
                 .collect(Collectors.toList());
 
         return new Page<>(content, page, size, studyLogPage.getTotalElements());
@@ -195,7 +189,7 @@ public class StudyLogService {
                 titleKeyword, category, startDate, endDate, page, size);
 
         List<StudyLogResponse> content = studyLogPage.getContent().stream()
-                .map(StudyLogResponse::from)
+                .map(studyLogMapper::toResponse)
                 .collect(Collectors.toList());
 
         return new Page<>(content, page, size, studyLogPage.getTotalElements());
@@ -229,8 +223,8 @@ public class StudyLogService {
         studyLogMapper.partialUpdate(request, studyLog);
 
         // 5. 저장 및 응답 반환
-        StudyLog updatedStudying = studyLogDao.update(studyLog);
-        return StudyLogResponse.from(updatedStudying);
+        StudyLog updatedStudyLog = studyLogDao.update(studyLog);
+        return studyLogMapper.toResponse(updatedStudyLog);
     }
 
     /**

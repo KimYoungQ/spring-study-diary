@@ -43,38 +43,6 @@ public class StudyLog {
         this.updatedAt = LocalDateTime.now();
     }
 
-
-    /**
-     * Update study log information
-     * Only updates non-null values (Partial Update)
-     */
-    public void update(String title, String content, Category category,
-                       Understanding understanding, Integer studyTime, LocalDate studyDate) {
-
-        if (title != null) {
-            this.title = title;
-        }
-        if (content != null) {
-            this.content = content;
-        }
-        if (category != null) {
-            this.category = category;
-        }
-        if (understanding != null) {
-            this.understanding = understanding;
-        }
-        if (studyTime != null) {
-            this.studyTime = studyTime;
-        }
-        if (studyDate != null) {
-            this.studyDate = studyDate;
-        }
-
-        // Update modification time
-        this.updatedAt = LocalDateTime.now();
-    }
-
-
     // Individual update methods for MapStruct
     public void updateTitle(String title) {
         this.title = title;
