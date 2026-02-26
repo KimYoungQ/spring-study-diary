@@ -204,7 +204,7 @@ public class StudyLogController {
 
     public ResponseEntity<ApiResponse<StudyLogResponse>> updateStudyLog(
             @PathVariable Long id,
-            @RequestBody StudyLogUpdateRequest request) {
+            @Valid @RequestBody StudyLogUpdateRequest request) {
 
         return ResponseEntity.ok(ApiResponse.success(studyLogService.updateStudyLog(id, request)));
     }

@@ -51,9 +51,6 @@ public class StudyLogService {
     public StudyLogResponse createStudyLog(StudyLogCreateRequest request) {
         log.info("Creating study log with title: {}", request.getTitle());
 
-        // 1. 요청 데이터 유효성 검증
-        validateCreateRequest(request);
-
         // 2. DTO → Entity 변환 (Using Builder pattern with Lombok)
         // Using MapStruct로 변경
         StudyLog studyLog = studyLogMapper.toEntity(request);
@@ -216,86 +213,12 @@ public class StudyLogService {
             throw new IllegalArgumentException("수정할 내용이 없습니다.");
         }
 
-        // 3. 수정할 값들의 유효성 검증
-        validateUpdateRequest(request);
-
         // 4. 업데이트
         studyLogMapper.partialUpdate(request, studyLog);
 
         // 5. 저장 및 응답 반환
         StudyLog updatedStudyLog = studyLogDao.update(studyLog);
         return studyLogMapper.toResponse(updatedStudyLog);
-    }
-
-    /**
-     * 생성 요청 유효성 검증
-     */
-    private void validateCreateRequest(StudyLogCreateRequest request) {
-        if (request.getTitle() == null || request.getTitle().trim().isEmpty()) {
-            throw new IllegalArgumentException("학습 주제는 필수입니다.");
-        }
-        if (request.getTitle().length() > 100) {
-            throw new IllegalArgumentException("학습 주제는 100자를 초과할 수 없습니다.");
-        }
-        if (request.getContent() == null || request.getContent().trim().isEmpty()) {
-            throw new IllegalArgumentException("학습 내용은 필수입니다.");
-        }
-        if (request.getContent().length() > 1000) {
-            throw new IllegalArgumentException("학습 내용은 1000자를 초과할 수 없습니다.");
-        }
-        if (request.getStudyTime() == null || request.getStudyTime() < 1) {
-            throw new IllegalArgumentException("학습 시간은 1분 이상이어야 합니다.");
-        }
-        if (Category.from(request.getCategory()) == null || request.getCategory().trim().isEmpty() ) {
-            throw new IllegalArgumentException(
-                    "유효하지 않은 카테고리입니다: " + request.getCategory());
-        }
-        if (Understanding.from(request.getUnderstanding()) == null || request.getUnderstanding().trim().isEmpty() ) {
-            throw new IllegalArgumentException(
-                    "유효하지 않은 이해도입니다: " + request.getCategory());
-        }
-    }
-
-    /**
-     * 수정 요청 유효성 검증
-     * null이 아닌 값만 검증합니다.
-     */
-    private void validateUpdateRequest(StudyLogUpdateRequest request) {
-        if (request.getTitle() != null) {
-            if (request.getTitle().trim().isEmpty()) {
-                throw new IllegalArgumentException("학습 주제는 빈 값일 수 없습니다.");
-            }
-            if (request.getTitle().length() > 100) {
-                throw new IllegalArgumentException("학습 주제는 100자를 초과할 수 없습니다.");
-            }
-        }
-
-        if (request.getContent() != null) {
-            if (request.getContent().trim().isEmpty()) {
-                throw new IllegalArgumentException("학습 내용은 빈 값일 수 없습니다.");
-            }
-            if (request.getContent().length() > 1000) {
-                throw new IllegalArgumentException("학습 내용은 1000자를 초과할 수 없습니다.");
-            }
-        }
-
-        if (request.getStudyTime() != null && request.getStudyTime() < 1) {
-            throw new IllegalArgumentException("학습 시간은 1분 이상이어야 합니다.");
-        }
-
-        if (request.getStudyDate() != null && request.getStudyDate().isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("학습 날짜는 미래일 수 없습니다.");
-        }
-
-        if (request.getCategory() != null && Category.from(request.getCategory()) == null) {
-            throw new IllegalArgumentException(
-                    "유효하지 않은 카테고리입니다: " + request.getCategory());
-        }
-
-        if (request.getUnderstanding() != null && Understanding.from(request.getUnderstanding()) == null) {
-            throw new IllegalArgumentException(
-                    "유효하지 않은 이해도입니다: " + request.getCategory());
-        }
     }
 
     /**
