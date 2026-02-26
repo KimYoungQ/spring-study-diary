@@ -29,20 +29,6 @@ public class StudyLog {
     @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    // 전체 필드 생성자
-    public StudyLog(Long id, String title, String content, Category category,
-                    Understanding understanding, Integer studyTime, LocalDate studyDate) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.category = category;
-        this.understanding = understanding;
-        this.studyTime = studyTime;
-        this.studyDate = studyDate;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
     // Individual update methods for MapStruct
     public void updateTitle(String title) {
         this.title = title;
