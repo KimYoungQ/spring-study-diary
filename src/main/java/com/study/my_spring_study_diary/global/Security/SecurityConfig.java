@@ -8,8 +8,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -26,24 +24,24 @@ public class SecurityConfig {
 //            AuthenticationConfiguration configuration) throws Exception {
 //        return configuration.getAuthenticationManager();
 //    }
-//
-//    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//        http
-//                // ① REST API이므로 CSRF 비활성화
-//                .csrf(csrf -> csrf.disable())
-//
-//                // ② JWT 방식이므로 세션을 사용하지 않음 (Stateless)
-//                .sessionManagement(session ->
-//                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                )
-//
-//                // ③ 요청별 인가 규칙
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/api/auth/**").permitAll()   // 회원가입, 로그인은 누구나 접근 가능
-//                        .anyRequest().authenticated()                   // 나머지는 인증 필요
-//                )
-//
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                // ① REST API이므로 CSRF 비활성화
+                .csrf(csrf -> csrf.disable())
+
+                // ② JWT 방식이므로 세션을 사용하지 않음 (Stateless)
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
+                // ③ 요청별 인가 규칙
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()   // 회원가입, 로그인은 누구나 접근 가능
+                        .anyRequest().authenticated()                   // 나머지는 인증 필요
+                );
+
 //                // ④ 인증 실패 시 커스텀 EntryPoint 사용
 //                .exceptionHandling(exception -> exception
 //                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
@@ -52,12 +50,7 @@ public class SecurityConfig {
 //                // ⑤ JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 배치
 //                .addFilterBefore(jwtAuthenticationFilter,
 //                        UsernamePasswordAuthenticationFilter.class);
-//
-//        return http.build();
-//    }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return http.build();
     }
 }

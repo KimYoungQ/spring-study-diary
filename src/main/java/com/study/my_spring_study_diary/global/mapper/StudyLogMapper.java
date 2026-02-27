@@ -38,8 +38,8 @@ public interface StudyLogMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "category", expression = "java(com.study.my_spring_study_diary.entity.Category.valueOf(request.getCategory()))")
-    @Mapping(target = "understanding", expression = "java(com.study.my_spring_study_diary.entity.Understanding.valueOf(request.getUnderstanding()))")
+    @Mapping(target = "category", expression = "java(com.study.my_spring_study_diary.study_log.entity.Category.valueOf(request.getCategory()))")
+    @Mapping(target = "understanding", expression = "java(com.study.my_spring_study_diary.study_log.entity.Understanding.valueOf(request.getUnderstanding()))")
     StudyLog toEntity(StudyLogCreateRequest request);
 
     /**
@@ -59,8 +59,8 @@ public interface StudyLogMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "category", expression = "java(request.getCategory() != null ? com.study.my_spring_study_diary.entity.Category.valueOf(request.getCategory()) : studyLog.getCategory())")
-    @Mapping(target = "understanding", expression = "java(request.getUnderstanding() != null ? com.study.my_spring_study_diary.entity.Understanding.valueOf(request.getUnderstanding()) : studyLog.getUnderstanding())")
+    @Mapping(target = "category", expression = "java(request.getCategory() != null ? com.study.my_spring_study_diary.study_log.entity.Category.valueOf(request.getCategory()) : studyLog.getCategory())")
+    @Mapping(target = "understanding", expression = "java(request.getUnderstanding() != null ? com.study.my_spring_study_diary.study_log.entity.Understanding.valueOf(request.getUnderstanding()) : studyLog.getUnderstanding())")
     void updateEntityFromRequest(StudyLogUpdateRequest request, @MappingTarget StudyLog studyLog);
 
     /**

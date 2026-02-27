@@ -5,7 +5,9 @@ import com.study.my_spring_study_diary.auth.dto.SignupRequest;
 import com.study.my_spring_study_diary.auth.dto.SignupResponse;
 import com.study.my_spring_study_diary.auth.entity.User;
 import com.study.my_spring_study_diary.auth.entity.UserRole;
+import com.study.my_spring_study_diary.study_log.entity.StudyLog;
 import com.study.my_spring_study_diary.study_log.exception.DuplicateResourceException;
+import com.study.my_spring_study_diary.study_log.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,13 +30,16 @@ public class AuthService {
         log.info("Signup attempt for username: {}. email: {}", request.getUsername(), request.getEmail());
 
         // 1. 아이디 중복 검사
-        if (userDao.existsByUserName(request.getUsername())) {
-            throw new DuplicateResourceException("Username already exists: " + request.getUsername());
+        if(userDao.existsByUserName(request.getUsername()).isPresent()) {
+            log.warn("Study log not found with ID: {}", request.getUsername());
+            throw new DuplicateResourceException("Username", request.getUsername());
         }
 
+
         // 2. 이메일 중복 검사
-        if (userDao.existsByEmail(request.getEmail())) {
-            throw new DuplicateResourceException("Email already exists: " + request.getEmail());
+        if(userDao.existsByEmail(request.getEmail()).isPresent()) {
+            log.warn("Study log not found with ID: {}", request.getUsername());
+            throw new DuplicateResourceException("Email", request.getEmail());
         }
 
         // 3. 사용자 엔티티 생성 및 저장
@@ -58,4 +63,4 @@ public class AuthService {
                 .build();
 
     }
-}`
+}

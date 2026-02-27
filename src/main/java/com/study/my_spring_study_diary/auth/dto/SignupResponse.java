@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SignupResponse {
 
-    private String id;
+    private Long id;
     private String username;
     private String email;
 }
