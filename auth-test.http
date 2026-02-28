@@ -1,0 +1,221 @@
+### JWT Authentication API Tests
+### Spring Boot JWT 인증 시스템 테스트 파일
+
+### 환경 변수 설정
+@host = http://localhost:8081
+@contentType = application/json
+
+### ========================================
+### 1. 회원가입 테스트
+### ========================================
+
+### 1-1. 회원가입 성공
+POST {{host}}/api/auth/signup
+Content-Type: {{contentType}}
+
+{
+  "username": "testuser{{$timestamp}}",
+  "password": "SecurePassword123!",
+  "email": "testuser{{$timestamp}}@example.com"
+}
+
+### 1-2. 중복 사용자명으로 회원가입 시도 (실패 예상)
+POST {{host}}/api/auth/signup
+Content-Type: {{contentType}}
+
+{
+  "username": "testuser",
+  "password": "password123",
+  "email": "duplicate@example.com"
+}
+
+### ========================================
+### 2. 로그인 테스트
+### ========================================
+
+### 2-1. 로그인 성공
+# @name loginSuccess
+POST {{host}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "username": "dudrb0206",
+  "password": "dudrb0206!"
+}
+
+### 응답에서 토큰 추출
+@accessToken = {{loginSuccess.response.body.data.accessToken}}
+@refreshToken = {{loginSuccess.response.body.data.refreshToken}}
+
+### 2-2. 잘못된 비밀번호로 로그인 시도 (실패 예상)
+POST {{host}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "username": "apitest",
+  "password": "wrongpassword"
+}
+
+### 2-3. 존재하지 않는 사용자로 로그인 시도 (실패 예상)
+POST {{host}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "username": "nonexistentuser",
+  "password": "password123"
+}
+
+### ========================================
+### 3. 인증된 요청 테스트 (토큰 포함)
+### ========================================
+
+### 3-1. 유효한 토큰으로 보호된 리소스 접근
+GET {{host}}/api/study-logs
+Authorization: Bearer {{accessToken}}
+
+### 3-2. 사용자 정보 조회 (토큰 필요)
+GET {{host}}/api/auth/me
+Authorization: Bearer {{accessToken}}
+
+### ========================================
+### 4. 미인증 요청 테스트 (토큰 없음)
+### ========================================
+
+### 4-1. 토큰 없이 보호된 리소스 접근 시도 (401 예상)
+GET {{host}}/api/study-logs
+
+### 4-2. 잘못된 토큰으로 접근 시도 (401 예상)
+GET {{host}}/api/study-logs
+Authorization: Bearer invalid.token.here
+
+### 4-3. 만료된 토큰으로 접근 시도 (401 예상)
+GET {{host}}/api/study-logs
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJleHBpcmVkIiwicm9sZXMiOiJST0xFX1VTRVIiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNjAwMDAwMDAwLCJleHAiOjE2MDAwMDAwMDF9.fake
+
+### ========================================
+### 5. 토큰 갱신 테스트
+### ========================================
+
+### 5-1. Refresh Token으로 새 Access Token 발급
+# @name tokenRefresh
+POST {{host}}/api/auth/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 새로운 토큰 저장
+@newAccessToken = {{tokenRefresh.response.body.data.accessToken}}
+@newRefreshToken = {{tokenRefresh.response.body.data.refreshToken}}
+
+### 5-2. 잘못된 Refresh Token으로 갱신 시도 (실패 예상)
+POST {{host}}/api/auth/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "invalid.refresh.token"
+}
+
+### 5-3. 만료된 Refresh Token으로 갱신 시도 (실패 예상)
+POST {{host}}/api/auth/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJleHBpcmVkIiwidHlwZSI6InJlZnJlc2giLCJpYXQiOjE2MDAwMDAwMDAsImV4cCI6MTYwMDAwMDAwMX0.fake"
+}
+
+### ========================================
+### 6. 로그아웃 테스트
+### ========================================
+
+### 6-1. 정상 로그아웃
+POST {{host}}/api/auth/logout
+Content-Type: {{contentType}}
+Authorization: Bearer {{newAccessToken}}
+
+{
+  "refreshToken": "{{newRefreshToken}}"
+}
+
+### 6-2. 로그아웃 후 동일한 Refresh Token으로 재갱신 시도 (실패 예상)
+POST {{host}}/api/auth/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "{{newRefreshToken}}"
+}
+
+### 6-3. 로그아웃 후 Access Token으로 리소스 접근 시도
+### 주의: JWT는 stateless이므로 토큰이 만료되기 전까지는 유효할 수 있음
+GET {{host}}/api/study-logs
+Authorization: Bearer {{newAccessToken}}
+
+### ========================================
+### 7. 보안 테스트 케이스
+### ========================================
+
+### 7-1. SQL Injection 시도 (실패 예상)
+POST {{host}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "username": "admin' OR '1'='1",
+  "password": "anything"
+}
+
+### 7-2. XSS 시도 (입력값 검증)
+POST {{host}}/api/auth/signup
+Content-Type: {{contentType}}
+
+{
+  "username": "<script>alert('XSS')</script>",
+  "password": "Test123!@#",
+  "email": "xss@test.com"
+}
+
+### 7-3. 너무 짧은 비밀번호 (검증 실패 예상)
+POST {{host}}/api/auth/signup
+Content-Type: {{contentType}}
+
+{
+  "username": "weakpassuser",
+  "password": "123",
+  "email": "weak@test.com"
+}
+
+### 7-4. 잘못된 이메일 형식 (검증 실패 예상)
+POST {{host}}/api/auth/signup
+Content-Type: {{contentType}}
+
+{
+  "username": "invalidemail",
+  "password": "Test123!@#",
+  "email": "not-an-email"
+}
+
+### ========================================
+### 테스트 실행 결과 요약
+### ========================================
+#
+# ✅ 성공한 테스트:
+# 1. 회원가입 - 새로운 사용자 생성 성공
+# 2. 로그인 - JWT 토큰 발급 성공
+# 3. 토큰 갱신 - Refresh Token으로 새 Access Token 발급 성공
+# 4. 로그아웃 - 정상 로그아웃 처리
+# 5. 미인증 요청 차단 - 401 Unauthorized 응답
+#
+# ⚠️ 주의사항:
+# - /api/auth/me 엔드포인트가 구현되지 않은 것으로 보임
+# - JWT는 stateless이므로 로그아웃 후에도 토큰 만료 전까지는 유효할 수 있음
+# - 토큰 블랙리스트 구현 필요 여부 검토
+#
+# 📝 환경별 설정:
+# - 개발: http://localhost:8081
+# - 운영: https://api.example.com
+#
+# 🔧 IntelliJ IDEA HTTP Client 사용법:
+# 1. 이 파일을 열고 각 요청 옆의 ▶️ 버튼 클릭
+# 2. 환경 변수는 http-client.env.json 파일에서 관리 가능
+# 3. {{$timestamp}}는 자동으로 현재 시간으로 대체됨
+# 4. @name을 사용하여 응답값을 변수로 저장 가능

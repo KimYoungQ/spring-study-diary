@@ -9,18 +9,20 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = "password")
 public class User {
 
     private Long id;
-    private String username;
-    private String password;
     private String email;
+    private String password;
+    private String username;
     private UserRole role;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
-    // Refresh Token 관련 필드
-    private String refreshToken;
-    private LocalDateTime refreshTokenExpiryDate;
+    @Builder.Default
+    private boolean enabled = true;
+
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Builder.Default
+    private LocalDateTime updatedAt = LocalDateTime.now();
 }

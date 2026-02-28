@@ -11,6 +11,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
+import java.sql.Timestamp;
 import java.util.Optional;
 
 @Slf4j
@@ -53,10 +54,24 @@ public class MySQLUserDaoImpl implements UserDao {
         return user;
     }
 
+    /**
+     * Save refresh token
+     */
+    public void saveRefreshToken(Long userId, String token, Timestamp expiresAt) {
+        // First, delete any existing refresh tokens for this user
+        String deleteSql = "DELETE FROM refresh_tokens WHERE user_id = ?";
+        jdbcTemplate.update(deleteSql, userId);
+
+        // Insert new refresh token
+        String insertSql = "INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, ?)";
+        jdbcTemplate.update(insertSql, userId, token, expiresAt);
+        log.debug("Saved refresh token for user ID: {}", userId);
+    }
+
     // ====================== Read ======================
 
     @Override
-    public Optional<User> existsByUserName(String userName) {
+    public Optional<User> findByUsername(String userName) {
 
         String sql = "SELECT * FROM users WHERE username = ?";
 
@@ -69,7 +84,7 @@ public class MySQLUserDaoImpl implements UserDao {
     }
 
     @Override
-    public Optional<User> existsByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
 
         String sql = "SELECT * FROM users WHERE email = ?";
 

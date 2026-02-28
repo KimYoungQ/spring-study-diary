@@ -1,5 +1,7 @@
 package com.study.my_spring_study_diary.auth.controller;
 
+import com.study.my_spring_study_diary.auth.dto.LoginRequest;
+import com.study.my_spring_study_diary.auth.dto.LoginResponse;
 import com.study.my_spring_study_diary.auth.dto.SignupRequest;
 import com.study.my_spring_study_diary.auth.dto.SignupResponse;
 import com.study.my_spring_study_diary.auth.service.AuthService;
@@ -23,6 +25,19 @@ public class AuthController {
     private final AuthService authService;
 
     /**
+     * User login
+     * POST /api/auth/login
+     */
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
+        log.info("Login request for username: {}", request.getUsername());
+
+        LoginResponse response = authService.login(request);
+
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
      * User signup/registration
      * POST /api/auth/signup
      */
@@ -36,4 +51,6 @@ public class AuthController {
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response));
     }
+
+
 }

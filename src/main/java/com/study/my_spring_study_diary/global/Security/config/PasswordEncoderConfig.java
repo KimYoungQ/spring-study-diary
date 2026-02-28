@@ -1,4 +1,4 @@
-package com.study.my_spring_study_diary.global.Security;
+package com.study.my_spring_study_diary.global.Security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

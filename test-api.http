@@ -4,21 +4,6 @@
 @baseUrl = http://localhost:8081
 @contentType = application/json
 
-
-### ================================
-### Spring login test
-### ================================
-
-POST {{baseUrl}}/api/auth/signup
-Content-Type: {{contentType}}
-
-{
-    "username" : "dudrb0206",
-    "password" : "dudrb0206!",
-    "email" : "dudeb0206@daum.net"
-}
-
-
 ### ================================
 ### 1. CREATE - 학습 일지 생성
 ### ================================
