@@ -125,7 +125,7 @@ public class AuthService {
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(UserRole.ROLE_USER)
+                .role(UserRole.USER)
                 .build();
 
         User savedUser = userDao.save(newUser);
