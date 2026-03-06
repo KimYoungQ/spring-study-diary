@@ -38,7 +38,7 @@ import java.util.List;
 @RequestMapping("/api/v1/logs")
 @RequiredArgsConstructor
 @Validated
-public class StudyLogController {
+public class StudyLogController implements StudyLogControllerApi {
 
     private final StudyLogService studyLogService;
 

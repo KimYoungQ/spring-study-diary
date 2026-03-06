@@ -42,7 +42,26 @@ public class SecurityConfig {
 
                 // ③ 요청별 인가 규칙
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()   // 회원가입, 로그인은 누구나 접근 가능
+                        // Public endpoints - no authentication required
+                        .requestMatchers(
+                                "/api/auth/login",
+                                "/api/auth/signup",
+                                "/api/auth/refresh",
+                                "/api/auth/logout"
+                        ).permitAll()
+
+                        // Swagger/OpenAPI endpoints
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html",
+                                "/swagger-resources/**",
+                                "/webjars/**"
+                        ).permitAll()
+
+                        // H2 console (only for test profile)
+                        .requestMatchers("/h2-console/**").permitAll()
+
                         .anyRequest().authenticated()                   // 나머지는 인증 필요
                 )
 
