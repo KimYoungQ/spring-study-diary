@@ -113,7 +113,7 @@ public interface StudyLogControllerApi {
                                           "message": "Token has expired"
                                         }
                                     }
-                                            """
+                                    """
                             )
                     )
             )

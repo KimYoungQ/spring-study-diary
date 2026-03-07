@@ -16,6 +16,7 @@ public class LoginResponse {
     private String refreshToken;
 
     @JsonProperty("token_type")
+    @Builder.Default
     private String tokenType = "Bearer";
 
     @JsonProperty("expires_in")
