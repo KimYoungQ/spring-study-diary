@@ -2,6 +2,7 @@ package com.study.my_spring_study_diary.global.Security.config;
 
 import com.study.my_spring_study_diary.global.Security.jwt.JwtAuthenticationEntryPoint;
 import com.study.my_spring_study_diary.global.Security.jwt.JwtAuthenticationFilter;
+import com.study.my_spring_study_diary.global.filter.MdcLoggingFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -72,7 +73,11 @@ public class SecurityConfig {
 
                 // ⑤ JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 배치
                 .addFilterBefore(jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class);
+                        UsernamePasswordAuthenticationFilter.class)
+
+                // ⑥ MDC 필터를 JWT 필터 뒤에 배치 (인증 정보 설정 후 실행)
+                .addFilterAfter(new MdcLoggingFilter(),
+                        JwtAuthenticationFilter.class);
 
         return http.build();
     }

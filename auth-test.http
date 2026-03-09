@@ -196,6 +196,21 @@ Content-Type: {{contentType}}
   "email": "not-an-email"
 }
 
+### 실제 구현 로직 테스트
+### Spring Boot 학습 일지 생성
+POST {{host}}/api/v1/logs
+Content-Type: {{contentType}}
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "Spring",
+  "content": "Spring Boot의 기본 구조와 어노테이션에 대해 학습했습니다.",
+  "category": "SPRING",
+  "understanding": "VERY_GOOD",
+  "studyTime": 120,
+  "studyDate": "2026-02-05"
+}
+
 ### ========================================
 ### 테스트 실행 결과 요약
 ### ========================================

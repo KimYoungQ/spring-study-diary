@@ -41,6 +41,8 @@ logging:
     com.study.myspringstudydiary: DEBUG
     org.springframework.jdbc: DEBUG
     com.zaxxer.hikari: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] [%X{requestId}] [%X{userId:-anonymous}] %-5level %logger{36} - %msg%n"
 
 # JWT 설정 (공통)
 jwt:
