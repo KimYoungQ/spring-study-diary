@@ -1,15 +1,14 @@
 package com.study.my_spring_study_diary.auth.service;
 
 import com.study.my_spring_study_diary.auth.dao.UserDao;
-import com.study.my_spring_study_diary.auth.dto.LoginRequest;
-import com.study.my_spring_study_diary.auth.dto.LoginResponse;
-import com.study.my_spring_study_diary.auth.dto.SignupRequest;
-import com.study.my_spring_study_diary.auth.dto.SignupResponse;
+import com.study.my_spring_study_diary.auth.dto.request.LoginRequest;
+import com.study.my_spring_study_diary.auth.dto.response.LoginResponse;
+import com.study.my_spring_study_diary.auth.dto.request.SignupRequest;
+import com.study.my_spring_study_diary.auth.dto.response.SignupResponse;
 import com.study.my_spring_study_diary.auth.entity.User;
 import com.study.my_spring_study_diary.auth.entity.UserRole;
 import com.study.my_spring_study_diary.global.Security.jwt.JwtTokenProvider;
 import com.study.my_spring_study_diary.study_log.exception.DuplicateResourceException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +27,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 

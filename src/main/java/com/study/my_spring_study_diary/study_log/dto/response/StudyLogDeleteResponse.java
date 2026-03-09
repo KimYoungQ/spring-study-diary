@@ -1,7 +1,9 @@
 package com.study.my_spring_study_diary.study_log.dto.response;
 
 import lombok.Builder;
+import lombok.Getter;
 
+@Getter
 @Builder
 public class StudyLogDeleteResponse {
 

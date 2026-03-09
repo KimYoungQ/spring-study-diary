@@ -19,13 +19,17 @@ Content-Type: {{contentType}}
   "email": "testuser{{$timestamp}}@example.com"
 }
 
+> {%
+    client.global.set("newUser", response.body.data.username);
+%}
+
 ### 1-2. 중복 사용자명으로 회원가입 시도 (실패 예상)
 POST {{host}}/api/auth/signup
 Content-Type: {{contentType}}
 
 {
-  "username": "testuser",
-  "password": "password123",
+  "username": "{{newUser}}",
+  "password": "SecurePassword123!",
   "email": "duplicate@example.com"
 }
 
@@ -39,20 +43,22 @@ POST {{host}}/api/auth/login
 Content-Type: {{contentType}}
 
 {
-  "username": "dudrb0206",
-  "password": "dudrb0206!"
+  "username": "{{newUser}}",
+  "password": "SecurePassword123!"
 }
 
-### 응답에서 토큰 추출
-@accessToken = {{loginSuccess.response.body.data.accessToken}}
-@refreshToken = {{loginSuccess.response.body.data.refreshToken}}
+> {%
+    client.global.set("accessToken", response.body.data.access_token);
+    client.global.set("refreshToken", response.body.data.refresh_token);
+    console.log("refreshToken:", response.body.data.refresh_token);
+%}
 
 ### 2-2. 잘못된 비밀번호로 로그인 시도 (실패 예상)
 POST {{host}}/api/auth/login
 Content-Type: {{contentType}}
 
 {
-  "username": "apitest",
+  "username": "{{newUser}}",
   "password": "wrongpassword"
 }
 
@@ -70,11 +76,7 @@ Content-Type: {{contentType}}
 ### ========================================
 
 ### 3-1. 유효한 토큰으로 보호된 리소스 접근
-GET {{host}}/api/study-logs
-Authorization: Bearer {{accessToken}}
-
-### 3-2. 사용자 정보 조회 (토큰 필요)
-GET {{host}}/api/auth/me
+GET {{host}}/api/v1/logs
 Authorization: Bearer {{accessToken}}
 
 ### ========================================
@@ -82,14 +84,14 @@ Authorization: Bearer {{accessToken}}
 ### ========================================
 
 ### 4-1. 토큰 없이 보호된 리소스 접근 시도 (401 예상)
-GET {{host}}/api/study-logs
+GET {{host}}/api/v1/logs
 
 ### 4-2. 잘못된 토큰으로 접근 시도 (401 예상)
-GET {{host}}/api/study-logs
+GET {{host}}/api/v1/logs
 Authorization: Bearer invalid.token.here
 
 ### 4-3. 만료된 토큰으로 접근 시도 (401 예상)
-GET {{host}}/api/study-logs
+GET {{host}}/api/v1/logs
 Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJleHBpcmVkIiwicm9sZXMiOiJST0xFX1VTRVIiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNjAwMDAwMDAwLCJleHAiOjE2MDAwMDAwMDF9.fake
 
 ### ========================================
@@ -105,10 +107,10 @@ Content-Type: {{contentType}}
   "refreshToken": "{{refreshToken}}"
 }
 
-### 새로운 토큰 저장
-@newAccessToken = {{tokenRefresh.response.body.data.accessToken}}
-@newRefreshToken = {{tokenRefresh.response.body.data.refreshToken}}
-
+> {%
+    client.global.set("newAccessToken", response.body.data.accessToken);
+    client.global.set("newRefreshToken", response.body.data.refreshToken);
+%}
 ### 5-2. 잘못된 Refresh Token으로 갱신 시도 (실패 예상)
 POST {{host}}/api/auth/refresh
 Content-Type: {{contentType}}
@@ -148,7 +150,7 @@ Content-Type: {{contentType}}
 
 ### 6-3. 로그아웃 후 Access Token으로 리소스 접근 시도
 ### 주의: JWT는 stateless이므로 토큰이 만료되기 전까지는 유효할 수 있음
-GET {{host}}/api/study-logs
+GET {{host}}/api/v1/logs
 Authorization: Bearer {{newAccessToken}}
 
 ### ========================================

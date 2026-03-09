@@ -1,4 +1,4 @@
-package com.study.my_spring_study_diary.auth.dto;
+package com.study.my_spring_study_diary.auth.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;

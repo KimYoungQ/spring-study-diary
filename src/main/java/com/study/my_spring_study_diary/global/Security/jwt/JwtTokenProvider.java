@@ -54,6 +54,24 @@ public class JwtTokenProvider {
     /**
      * username과 roles를 기반으로 Access Token 생성
      */
+    public String generateAccessToken(Long id, String username, String roles) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + accessTokenValidityInMilliseconds);
+
+        return Jwts.builder()
+                .subject(username)              // 토큰의 주체 (사용자 식별자)
+                .claim("id", id)
+                .claim("roles", roles)          // 권한 정보
+                .claim("type", "access")        // 토큰 타입 구분
+                .issuedAt(now)                  // 발급 시간
+                .expiration(expiryDate)         // 만료 시간
+                .signWith(secretKey)            // 서명
+                .compact();
+    }
+
+    /**
+     * username과 roles를 기반으로 Access Token 생성
+     */
     public String generateAccessToken(String username, String roles) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + accessTokenValidityInMilliseconds);

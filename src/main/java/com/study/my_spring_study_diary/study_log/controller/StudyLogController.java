@@ -54,10 +54,25 @@ public class StudyLogController implements StudyLogControllerApi {
     public ResponseEntity<ApiResponse<StudyLogResponse>>  createStudyLog(
             @Valid @RequestBody StudyLogCreateRequest request) {
 
-        //Service 호출하여 학습 일지 생성
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(ApiResponse.success(studyLogService.createStudyLog(request)));
+        log.info("학습 일지 생성 요청: title={}, category={}, studyTime={}분",
+                request.getTitle(), request.getCategory(), request.getStudyTime());
+        log.debug("학습 일지 상세 내용: understanding={}, studyDate={}, contentLength={}",
+                request.getUnderstanding(), request.getStudyDate(),
+                request.getContent() != null ? request.getContent().length() : 0);
+
+        try {
+            // Service 호출하여 학습 일지 생성
+            StudyLogResponse response = studyLogService.createStudyLog(request);
+
+            log.info("학습 일지 생성 성공: id={}, title={}", response.getId(), response.getTitle());
+
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(ApiResponse.success(response));
+        } catch (Exception e) {
+            log.error("학습 일지 생성 실패: title={}", request.getTitle(), e);
+            throw e;
+        }
     }
 
     /**
@@ -86,7 +101,15 @@ public class StudyLogController implements StudyLogControllerApi {
     public ResponseEntity<ApiResponse<StudyLogResponse>> getStudyLogById(
             @PathVariable @Positive(message = "ID는 양수여야 합니다") Long id) {
 
-        return ResponseEntity.ok(ApiResponse.success(studyLogService.getStudyLogById(id)));
+        log.info("학습 일지 단건 조회 요청: id={}", id);
+        try {
+            StudyLogResponse response = studyLogService.getStudyLogById(id);
+            log.debug("학습 일지 조회 성공: id={}, title={}", id, response.getTitle());
+            return ResponseEntity.ok(ApiResponse.success(response));
+        } catch (Exception e) {
+            log.error("학습 일지 조회 실패: id={}", id, e);
+            throw e;
+        }
     }
 
     /**
@@ -210,7 +233,18 @@ public class StudyLogController implements StudyLogControllerApi {
             @PathVariable Long id,
             @Valid @RequestBody StudyLogUpdateRequest request) {
 
-        return ResponseEntity.ok(ApiResponse.success(studyLogService.updateStudyLog(id, request)));
+        log.info("학습 일지 수정 요청: id={}, title={}", id, request.getTitle());
+        log.debug("수정 내용: category={}, understanding={}, studyTime={}",
+                request.getCategory(), request.getUnderstanding(), request.getStudyTime());
+
+        try {
+            StudyLogResponse response = studyLogService.updateStudyLog(id, request);
+            log.info("학습 일지 수정 성공: id={}", id);
+            return ResponseEntity.ok(ApiResponse.success(response));
+        } catch (Exception e) {
+            log.error("학습 일지 수정 실패: id={}", id, e);
+            throw e;
+        }
     }
 
     // ========== DELETE ==========
@@ -226,6 +260,14 @@ public class StudyLogController implements StudyLogControllerApi {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<StudyLogDeleteResponse>> deleteStudyLog(@PathVariable Long id) {
 
-        return ResponseEntity.ok(ApiResponse.success(studyLogService.deleteStudyLog(id)));
+        log.info("학습 일지 삭제 요청: id={}", id);
+        try {
+            StudyLogDeleteResponse response = studyLogService.deleteStudyLog(id);
+            log.info("학습 일지 삭제 성공: id={}, message={}", id, response.getMessage());
+            return ResponseEntity.ok(ApiResponse.success(response));
+        } catch (Exception e) {
+            log.error("학습 일지 삭제 실패: id={}", id, e);
+            throw e;
+        }
     }
 }

@@ -4,6 +4,7 @@ import com.study.my_spring_study_diary.auth.entity.User;
 import com.study.my_spring_study_diary.auth.entity.UserRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -92,6 +93,26 @@ public class MySQLUserDaoImpl implements UserDao {
             User user = jdbcTemplate.queryForObject(sql, userRowMapper, email);
             return Optional.ofNullable(user);
         } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Find user by refresh token
+     */
+    public Optional<User> findByRefreshToken(String refreshToken) {
+        String sql = """
+                SELECT m.* FROM users m
+                INNER JOIN refresh_tokens rt ON m.id = rt.user_id
+                WHERE rt.token = ? AND rt.expires_at > NOW()
+                """;
+
+        try {
+            User user = jdbcTemplate.queryForObject(sql, userRowMapper, refreshToken);
+            log.debug("Found user by refresh token");
+            return Optional.ofNullable(user);
+        } catch (EmptyResultDataAccessException e) {
+            log.debug("No user found with valid refresh token");
             return Optional.empty();
         }
     }

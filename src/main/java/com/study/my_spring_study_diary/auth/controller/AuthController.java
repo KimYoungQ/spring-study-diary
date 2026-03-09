@@ -1,9 +1,11 @@
 package com.study.my_spring_study_diary.auth.controller;
 
-import com.study.my_spring_study_diary.auth.dto.LoginRequest;
-import com.study.my_spring_study_diary.auth.dto.LoginResponse;
-import com.study.my_spring_study_diary.auth.dto.SignupRequest;
-import com.study.my_spring_study_diary.auth.dto.SignupResponse;
+import com.study.my_spring_study_diary.auth.dto.request.LoginRequest;
+import com.study.my_spring_study_diary.auth.dto.request.TokenRefreshRequest;
+import com.study.my_spring_study_diary.auth.dto.response.LoginResponse;
+import com.study.my_spring_study_diary.auth.dto.request.SignupRequest;
+import com.study.my_spring_study_diary.auth.dto.response.SignupResponse;
+import com.study.my_spring_study_diary.auth.dto.response.TokenRefreshResponse;
 import com.study.my_spring_study_diary.auth.service.AuthService;
 import com.study.my_spring_study_diary.global.common.ApiResponse;
 import jakarta.validation.Valid;
@@ -52,5 +54,29 @@ public class AuthController {
                 .body(ApiResponse.success(response));
     }
 
+    /**
+     * User logout (optional - invalidates refresh token)
+     * POST /api/auth/logout
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<String>> logout(@Valid @RequestBody TokenRefreshRequest request) {
+        log.info("Logout request");
 
+        authService.logout(request.getRefreshToken());
+
+        return ResponseEntity.ok(ApiResponse.success("Logged out successfully"));
+    }
+
+    /**
+     * Refresh access token
+     * POST /api/auth/refresh
+     */
+    @PostMapping("/refresh")
+    public ResponseEntity<ApiResponse<TokenRefreshResponse>> refresh(@Valid @RequestBody TokenRefreshRequest request) {
+        log.info("Token refresh request");
+
+        TokenRefreshResponse response = authService.refresh(request);
+
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
 }

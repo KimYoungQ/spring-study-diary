@@ -1,4 +1,4 @@
-package com.study.my_spring_study_diary.auth.dto;
+package com.study.my_spring_study_diary.auth.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;

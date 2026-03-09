@@ -1,13 +1,17 @@
 package com.study.my_spring_study_diary.auth.service;
 
+import com.study.my_spring_study_diary.auth.dao.RefreshTokenDao;
 import com.study.my_spring_study_diary.auth.dao.UserDao;
-import com.study.my_spring_study_diary.auth.dto.LoginRequest;
-import com.study.my_spring_study_diary.auth.dto.LoginResponse;
-import com.study.my_spring_study_diary.auth.dto.SignupRequest;
-import com.study.my_spring_study_diary.auth.dto.SignupResponse;
+import com.study.my_spring_study_diary.auth.dto.request.LoginRequest;
+import com.study.my_spring_study_diary.auth.dto.request.TokenRefreshRequest;
+import com.study.my_spring_study_diary.auth.dto.response.LoginResponse;
+import com.study.my_spring_study_diary.auth.dto.request.SignupRequest;
+import com.study.my_spring_study_diary.auth.dto.response.SignupResponse;
+import com.study.my_spring_study_diary.auth.dto.response.TokenRefreshResponse;
 import com.study.my_spring_study_diary.auth.entity.User;
 import com.study.my_spring_study_diary.auth.entity.UserRole;
 import com.study.my_spring_study_diary.auth.exception.AuthException;
+import com.study.my_spring_study_diary.auth.exception.InvalidTokenException;
 import com.study.my_spring_study_diary.global.Security.jwt.JwtTokenProvider;
 import com.study.my_spring_study_diary.study_log.exception.DuplicateResourceException;
 import jakarta.validation.Valid;
@@ -37,6 +41,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenDao refreshTokenDao;
 
     @Value("${jwt.access-token-validity}")
     private long accessTokenValidity;
@@ -138,5 +143,58 @@ public class AuthService {
                 .email(savedUser.getEmail())
                 .build();
 
+    }
+
+    /**
+     * Logout (invalidate refresh token)
+     */
+    @Transactional
+    public void logout(String refreshToken) {
+        log.info("Logout attempt");
+        refreshTokenDao.deleteRefreshToken(refreshToken);
+        log.info("Logout successful");
+    }
+
+    /**
+     * Refresh access token using refresh token
+     */
+    @Transactional
+    public TokenRefreshResponse refresh(TokenRefreshRequest request) {
+        String refreshToken = request.getRefreshToken();
+
+        log.info("Token refresh attempt");
+
+        // Validate refresh token
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            throw new InvalidTokenException("Invalid refresh token");
+        }
+
+        // Check if it's a refresh token
+        if (!jwtTokenProvider.isRefreshToken(refreshToken)) {
+            throw new InvalidTokenException("Token is not a refresh token");
+        }
+
+        // Find user by refresh token
+        User user = userDao.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new InvalidTokenException("Refresh token not found or expired"));
+
+        // Get user roles
+        UserRole userRole = user.getRole() != null ? user.getRole() : UserRole.USER;
+        String roles = "ROLE_" + userRole.name();
+
+        // Generate new tokens
+        String newAccessToken = jwtTokenProvider.generateAccessToken(user.getId(), user.getUsername(), roles);
+        String newRefreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
+
+        // Update refresh token in database
+        Date refreshTokenExpiry = jwtTokenProvider.getExpirationFromToken(newRefreshToken);
+        refreshTokenDao.saveRefreshToken(user.getId(), newRefreshToken, new Timestamp(refreshTokenExpiry.getTime()));
+
+        log.info("Token refreshed successfully for user: {}", user.getUsername());
+
+        return TokenRefreshResponse.of(
+                newAccessToken,
+                newRefreshToken
+        );
     }
 }
