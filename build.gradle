@@ -27,17 +27,12 @@ repositories {
 
 dependencies {
 
-	// MySQL 및 JDBC 의존성
-	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-	implementation 'mysql:mysql-connector-java:8.0.33'
-
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
 	// MySQL 및 JDBC 의존성, H2
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'mysql:mysql-connector-java:8.0.33'
-	implementation 'org.springframework.boot:spring-boot-h2console'
-	runtimeOnly 'com.h2database:h2'
+	implementation 'com.h2database:h2'
 
 	// Validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -72,9 +67,6 @@ dependencies {
 
 	// 이 하나가 JUnit 5 + Mockito + AssertJ + Spring Test를 모두 포함
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-	// 인메모리 DB (통합 테스트에서 실제 DB 대신 사용)
-	testRuntimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {

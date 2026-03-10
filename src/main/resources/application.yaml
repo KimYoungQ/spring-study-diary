@@ -3,31 +3,12 @@ server:
   port: 8081
   servlet:
     context-path:
+
 spring:
   application:
     name: my-spring-study-diary
-
-  # MySQL 데이터베이스 설정
-  datasource:
-    url: jdbc:mysql://localhost:3306/diary_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: root
-    password: rootpass
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      connection-timeout: 30000
-      maximum-pool-size: 10
-      minimum-idle: 5
-      idle-timeout: 600000
-      pool-name: StudyDiaryHikariCP
-
-  # SQL 로깅 설정
-  sql:
-    init:
-      mode: always
-      platform: mysql
-      encoding: UTF-8
-#      schema-locations: classpath:db/schema.sql
-#      data-locations: classpath:db/data.sql
+  profiles:
+    active: dev
 
   # Validation
   messages:
@@ -40,7 +21,6 @@ logging:
     root: INFO
     com.study.myspringstudydiary: DEBUG
     org.springframework.jdbc: DEBUG
-    com.zaxxer.hikari: DEBUG
   pattern:
     console: "%d{HH:mm:ss.SSS} [%thread] [%X{requestId}] [%X{userId:-anonymous}] %-5level %logger{36} - %msg%n"
 
