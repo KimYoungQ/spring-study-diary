@@ -12,12 +12,14 @@ import com.study.my_spring_study_diary.auth.entity.User;
 import com.study.my_spring_study_diary.auth.entity.UserRole;
 import com.study.my_spring_study_diary.auth.exception.AuthException;
 import com.study.my_spring_study_diary.auth.exception.InvalidTokenException;
+import com.study.my_spring_study_diary.event.auth.UserRegisteredEvent;
 import com.study.my_spring_study_diary.global.Security.jwt.JwtTokenProvider;
 import com.study.my_spring_study_diary.study_log.exception.DuplicateResourceException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -42,6 +45,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenDao refreshTokenDao;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Value("${jwt.access-token-validity}")
     private long accessTokenValidity;
@@ -136,6 +140,14 @@ public class AuthService {
         User savedUser = userDao.save(newUser);
 
         log.info("User registered successfully: {}", savedUser.getUsername());
+
+        // 🔥 이벤트 발행 추가
+        eventPublisher.publishEvent(new UserRegisteredEvent(
+                savedUser.getId(),
+                savedUser.getUsername(),
+                savedUser.getEmail(),
+                LocalDateTime.now()
+        ));
 
         return SignupResponse.builder()
                 .id(savedUser.getId())

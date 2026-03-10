@@ -9,6 +9,8 @@ import java.time.LocalDate;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class StudyLogCreateRequest {
 
     @NotBlank(message = "제목은 필수입니다")

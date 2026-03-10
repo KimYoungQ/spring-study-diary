@@ -1,5 +1,6 @@
 package com.study.my_spring_study_diary.study_log.service;
 
+import com.study.my_spring_study_diary.event.study.StudyLogCreatedEvent;
 import com.study.my_spring_study_diary.study_log.exception.InvalidPageRequestException;
 import com.study.my_spring_study_diary.study_log.exception.ResourceNotFoundException;
 import com.study.my_spring_study_diary.global.common.Page;
@@ -12,7 +13,9 @@ import com.study.my_spring_study_diary.study_log.entity.StudyLog;
 import com.study.my_spring_study_diary.global.mapper.StudyLogMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,6 +39,7 @@ public class StudyLogService {
     // 의존성 주입: Repository를 주입받음
     private final StudyLogDao studyLogDao;
     private final StudyLogMapper studyLogMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     // 페이징 관련 상수
     private static final int DEFAULT_PAGE_SIZE = 10;
@@ -46,6 +50,7 @@ public class StudyLogService {
      * @param request 생성 요청 DTO
      * @return 생성된 학습 일지 응답 DTO
      */
+    @Transactional
     public StudyLogResponse createStudyLog(StudyLogCreateRequest request) {
         log.info("Creating study log with title: {}", request.getTitle());
 
@@ -56,6 +61,10 @@ public class StudyLogService {
         // 3. 저장 (DAO 사용)
         StudyLog savedStudyLog = studyLogDao.save(studyLog);
         log.info("Successfully created study log with ID: {}", savedStudyLog.getId());
+
+        // 이벤트 발행 추가
+        eventPublisher.publishEvent(StudyLogCreatedEvent.from(savedStudyLog));
+        log.info("StudyLogCreatedEvent 발행 완료 - ID: {}", savedStudyLog.getId());
 
         // 4. Entity → Response DTO 변환 후 반환
         return studyLogMapper.toResponse(savedStudyLog);
