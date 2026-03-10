@@ -111,7 +111,6 @@ Content-Type: {{contentType}}
     client.global.set("newAccessToken", response.body.data.accessToken);
     client.global.set("newRefreshToken", response.body.data.refreshToken);
 %}
-
 ### 5-2. 잘못된 Refresh Token으로 갱신 시도 (실패 예상)
 POST {{host}}/api/auth/refresh
 Content-Type: {{contentType}}

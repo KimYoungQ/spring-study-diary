@@ -71,11 +71,6 @@ public class SecurityConfig {
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
 
-                // ④-1 H2 콘솔 iframe 허용 (X-Frame-Options 설정)
-                .headers(headers -> headers
-                        .frameOptions(frameOptions -> frameOptions.sameOrigin())
-                )
-
                 // ⑤ JWT 필터를 UsernamePasswordAuthenticationFilter 앞에 배치
                 .addFilterBefore(jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class)
