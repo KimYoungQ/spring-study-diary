@@ -1,5 +1,6 @@
 package com.study.my_spring_study_diary.study_log.service;
 
+import com.study.my_spring_study_diary.discord.service.DiscordNotificationService;
 import com.study.my_spring_study_diary.event.study.StudyLogCreatedEvent;
 import com.study.my_spring_study_diary.study_log.exception.InvalidPageRequestException;
 import com.study.my_spring_study_diary.study_log.exception.ResourceNotFoundException;
@@ -40,6 +41,7 @@ public class StudyLogService {
     private final StudyLogDao studyLogDao;
     private final StudyLogMapper studyLogMapper;
     private final ApplicationEventPublisher eventPublisher;
+    private final DiscordNotificationService discordNotificationService;
 
     // 페이징 관련 상수
     private static final int DEFAULT_PAGE_SIZE = 10;
@@ -65,6 +67,14 @@ public class StudyLogService {
         // 이벤트 발행 추가
         eventPublisher.publishEvent(StudyLogCreatedEvent.from(savedStudyLog));
         log.info("StudyLogCreatedEvent 발행 완료 - ID: {}", savedStudyLog.getId());
+
+        // 4. Discord 알림 전송 (비동기)
+        try {
+            discordNotificationService.sendStudyLogCreatedNotification(savedStudyLog);
+        } catch (Exception e) {
+            // Discord 실패가 메인 로직에 영향을 주지 않음
+            log.warn("Discord notification failed, but StudyLog was created", e);
+        }
 
         // 4. Entity → Response DTO 변환 후 반환
         return studyLogMapper.toResponse(savedStudyLog);

@@ -97,4 +97,20 @@ public class AsyncConfig implements AsyncConfigurer {
             // TODO: 실제 환경에서는 Slack, Discord 알림 또는 Sentry 등으로 에러 리포팅
         };
     }
+
+    /**
+     * Discord 용
+     */
+    @Bean(name = "asyncExecutor")
+    public Executor asyncExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(2);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(100);
+        executor.setThreadNamePrefix("Discord-");
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(60);
+        executor.initialize();
+        return executor;
+    }
 }
