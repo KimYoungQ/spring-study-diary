@@ -7,7 +7,6 @@ Spring Boot를 이용한 학습 일지 관리 REST API 프로젝트입니다. La
 - **Language**: Java 17+
 - **Framework**: Spring Boot 3.x
 - **Database**: MySQL 8.0.28 (Production), H2 (Test)
-- **ORM**: Spring Data JPA
 - **Security**: Spring Security + JWT (JJWT 0.12.6)
 - **API 문서**: SpringDoc OpenAPI (Swagger 2.7.0)
 - **개발 생산성**: Lombok, MapStruct
