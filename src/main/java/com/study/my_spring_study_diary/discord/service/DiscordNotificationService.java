@@ -1,5 +1,6 @@
 package com.study.my_spring_study_diary.discord.service;
 
+import com.google.common.util.concurrent.RateLimiter;
 import com.study.my_spring_study_diary.discord.dto.DiscordWebhookMessage;
 import com.study.my_spring_study_diary.study_log.entity.StudyLog;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,8 @@ public class DiscordNotificationService {
     private static final int COLOR_INFO = 0x3498DB;     // 파란색
     private static final int COLOR_WARNING = 0xFFD700;  // 금색
     private static final int COLOR_ERROR = 0xFF0000;    // 빨간색
+
+    private final RateLimiter rateLimiter = RateLimiter.create(0.5); // 초당 0.5개
 
     /**
      * StudyLog 생성 알림 (비동기)
@@ -140,6 +143,12 @@ public class DiscordNotificationService {
      * Discord Webhook으로 메시지 전송
      */
     private void sendWebhookMessage(DiscordWebhookMessage message) {
+
+        if (!rateLimiter.tryAcquire()) {
+            log.warn("Discord rate limit exceeded, skipping notification");
+            return;
+        }
+
         discordRestClient.post()
                 .uri(webhookUrl)
                 .body(message)

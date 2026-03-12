@@ -7,6 +7,7 @@ import com.study.my_spring_study_diary.auth.dto.request.SignupRequest;
 import com.study.my_spring_study_diary.auth.dto.response.SignupResponse;
 import com.study.my_spring_study_diary.auth.entity.User;
 import com.study.my_spring_study_diary.auth.entity.UserRole;
+import com.study.my_spring_study_diary.event.auth.UserRegisteredEvent;
 import com.study.my_spring_study_diary.global.Security.jwt.JwtTokenProvider;
 import com.study.my_spring_study_diary.study_log.exception.DuplicateResourceException;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -44,6 +46,9 @@ class AuthServiceTest {
 
     @Mock
     private AuthenticationManager authenticationManager;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private AuthService authService;
@@ -92,6 +97,7 @@ class AuthServiceTest {
         assertThat(newUser.getEmail()).isEqualTo(email);
 
         verify(userDao).save(any(User.class));
+        verify(eventPublisher).publishEvent(any(UserRegisteredEvent.class));
     }
 
     @Test

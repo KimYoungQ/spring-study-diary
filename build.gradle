@@ -75,6 +75,9 @@ dependencies {
 
 	// 인메모리 DB (통합 테스트에서 실제 DB 대신 사용)
 	testRuntimeOnly 'com.h2database:h2'
+
+	// 요청 속도 제한(Rate Limiter)용 Guava 라이브러리
+	implementation 'com.google.guava:guava:33.1.0-jre'
 }
 
 tasks.named('test') {
