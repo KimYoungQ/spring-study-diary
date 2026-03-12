@@ -1,5 +1,6 @@
 package com.study.my_spring_study_diary.global.config;
 
+import com.study.my_spring_study_diary.global.interceptor.LoggingInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -16,7 +17,7 @@ public class RestClientConfig {
      * Discord Webhook 전용 RestClient
      */
     @Bean(name = "discordRestClient")
-    public RestClient discordRestClient() {
+    public RestClient discordRestClient(LoggingInterceptor loggingInterceptor) {
         // 타임아웃 설정
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(Duration.ofSeconds(5));
@@ -26,6 +27,7 @@ public class RestClientConfig {
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultHeader(HttpHeaders.USER_AGENT, "StudyLogBot/1.0")
                 .requestFactory(factory)
+                .requestInterceptor(loggingInterceptor)
                 .build();
     }
 }
