@@ -79,7 +79,23 @@ springdoc:
 discord:
   webhook:
     # 환경변수로 관리 (보안)
-    url: ${DISCORD_WEBHOOK_URL:https://discord.com/api/webhooks/1481275038643785912/a-lDft0Nq8u5B0_9P0HUECdfLkURj9VRR6-ZyRyx9zHTv1VroJZ9tbYOvELAP5lniCnR}
-    enabled: ${DISCORD_WEBHOOK_ENABLED:false}
+    url: ${DISCORD_WEBHOOK_URL:https://discord.com/api/webhooks/1481275038643785912/a-lDft0Nq8u5B0_9P0HUECdfLkURj9VRR6-ZyRyx9zHTv1VroJZ9tbYOvELAP5lniCnR1}
+    enabled: ${DISCORD_WEBHOOK_ENABLED:true}
     username: Study Log Bot
     avatar-url: https://i.imgur.com/AfFp7pu.png
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      discordWebhook:
+        # slidingWindowSize: 실패율 계산에 사용할 최근 호출 수
+        sliding-window-size: 10
+        # failureRateThreshold: 서킷을 OPEN으로 전환하는 실패율 (%)
+        # 최근 10번 중 50%(5번) 이상 실패하면 서킷 OPEN
+        failure-rate-threshold: 50
+        # waitDurationInOpenState: OPEN 상태에서 HALF_OPEN으로 전환까지의 대기 시간
+        wait-duration-in-open-state: 10s
+        # permittedNumberOfCallsInHalfOpenState: HALF_OPEN에서 테스트할 요청 수
+        permitted-number-of-calls-in-half-open-state: 3
+        # minimumNumberOfCalls: 실패율 계산을 시작하기 위한 최소 호출 수
+        minimum-number-of-calls: 5

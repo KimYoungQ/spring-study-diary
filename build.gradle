@@ -78,6 +78,11 @@ dependencies {
 
 	// 요청 속도 제한(Rate Limiter)용 Guava 라이브러리
 	implementation 'com.google.guava:guava:33.1.0-jre'
+
+	// 서킷 브레이커
+	implementation "io.github.resilience4j:resilience4j-spring-boot3:2.2.0"
+	implementation "org.springframework.boot:spring-boot-starter-actuator"
+	implementation "org.springframework.boot:spring-boot-starter-aop:3.2.5"
 }
 
 tasks.named('test') {

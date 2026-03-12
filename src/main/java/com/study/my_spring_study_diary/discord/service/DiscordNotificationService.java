@@ -1,17 +1,12 @@
 package com.study.my_spring_study_diary.discord.service;
 
-import com.google.common.util.concurrent.RateLimiter;
 import com.study.my_spring_study_diary.discord.dto.DiscordWebhookMessage;
 import com.study.my_spring_study_diary.study_log.entity.StudyLog;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -23,11 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DiscordNotificationService {
 
-    @Qualifier("discordRestClient")
-    private final RestClient discordRestClient;
-
-    @Value("${discord.webhook.url}")
-    private String webhookUrl;
+    private final DiscordWebhookSender webhookSender;
 
     @Value("${discord.webhook.enabled}")
     private boolean webhookEnabled;
@@ -43,8 +34,6 @@ public class DiscordNotificationService {
     private static final int COLOR_INFO = 0x3498DB;     // 파란색
     private static final int COLOR_WARNING = 0xFFD700;  // 금색
     private static final int COLOR_ERROR = 0xFF0000;    // 빨간색
-
-    private final RateLimiter rateLimiter = RateLimiter.create(0.5); // 초당 0.5개
 
     /**
      * StudyLog 생성 알림 (비동기)
@@ -65,7 +54,8 @@ public class DiscordNotificationService {
                     COLOR_SUCCESS
             );
 
-            sendWebhookMessage(message);
+            // 별도 Bean을 통해 호출 → 프록시를 거치므로 @CircuitBreaker 정상 작동
+            webhookSender.send(message);
             log.info("Discord notification sent for StudyLog ID: {}", studyLog.getId());
 
         } catch (Exception e) {
@@ -140,33 +130,6 @@ public class DiscordNotificationService {
     }
 
     /**
-     * Discord Webhook으로 메시지 전송
-     */
-    private void sendWebhookMessage(DiscordWebhookMessage message) {
-
-        if (!rateLimiter.tryAcquire()) {
-            log.warn("Discord rate limit exceeded, skipping notification");
-            return;
-        }
-
-        discordRestClient.post()
-                .uri(webhookUrl)
-                .body(message)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    log.error("Discord API Client Error: {}", response.getStatusCode());
-                    throw new RestClientException("Discord API 요청 실패");
-                })
-                .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
-                    log.error("Discord API Server Error: {}", response.getStatusCode());
-                    throw new RestClientException("Discord 서버 오류");
-                })
-                .toBodilessEntity();  // Discord는 응답 본문 없음
-
-        log.debug("Discord webhook message sent successfully");
-    }
-
-    /**
      * 테스트 알림 전송
      */
     public boolean sendTestNotification() {
@@ -181,7 +144,7 @@ public class DiscordNotificationService {
                     .content("🎉 Discord 연동 테스트 성공! Study Log Bot이 정상 작동합니다.")
                     .build();
 
-            sendWebhookMessage(message);
+            webhookSender.send(message);
             return true;
         } catch (Exception e) {
             log.error("Test notification failed", e);
