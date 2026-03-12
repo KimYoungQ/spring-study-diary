@@ -7,16 +7,6 @@ Spring Boot를 이용한 학습 일지 관리 REST API 프로젝트입니다. La
 - **Language**: Java 17+
 - **Framework**: Spring Boot 4.0.3-SNAPSHOT
 - **Database**: MySQL 8.0 (Production), H2 (Test)
-- **Data Access**: Spring JDBC (DAO 패턴)
-- **Security**: Spring Security + JWT (JJWT 0.12.6)
-- **API 문서**: SpringDoc OpenAPI (Swagger 2.7.0)
-- **개발 생산성**: Lombok, MapStruct 1.6.3
-- **비동기**: Spring @Async, Event 기반 아키텍처
-- **Rate Limiting**: Google Guava 33.1.0-jre
-- **Circuit Breaker**: Resilience4j 2.2.0
-- **Monitoring**: Spring Boot Actuator
-- **AOP**: Spring AOP 3.2.5
-- **알림**: Discord Webhook 연동
 - **Build Tool**: Gradle
 - **Container**: Docker & Docker Compose
 
