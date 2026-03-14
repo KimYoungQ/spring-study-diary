@@ -42,11 +42,13 @@ src/main/java/com/study/my_spring_study_diary/
 │   └── handler/                 #   UserRegistrationHandler, StudyLogNotificationHandler, StudyAnalyticsHandler
 │
 └── global/                      # 전역 설정 및 인프라
-    ├── Security/                #   CustomUserDetails, SecurityUtil
+    ├── Security/                #   CustomUserDetails, SecurityUtil, CustomAccessDeniedHandler
     │   ├── config/              #     PasswordEncoderConfig, SecurityConfig
     │   └── jwt/                 #     JwtTokenProvider, JwtAuthenticationFilter, JwtAuthenticationEntryPoint
     ├── common/                  #   ApiResponse (공통 응답), Page (페이지네이션)
-    ├── config/                  #   AsyncConfig (스레드 풀), RestClientConfig (HTTP 클라이언트), OpenApiConfig
+    ├── config/                  #   AsyncConfig (스레드 풀), RestClientConfig (HTTP 클라이언트)
+    │   └── properties/          #     JwtProperties, PropertiesConfig
+    ├── docs/config/             #   OpenApiConfig (Swagger 설정)
     ├── exception/               #   GlobalExceptionHandler, BusinessException, ErrorCode
     ├── filter/                  #   MdcLoggingFilter (요청 추적)
     ├── interceptor/             #   LoggingInterceptor (HTTP 요청/응답 로깅)
