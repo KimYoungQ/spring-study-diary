@@ -2,6 +2,7 @@ package com.study.my_spring_study_diary.global.Security.jwt;
 
 import com.study.my_spring_study_diary.auth.exception.ExpiredTokenException;
 import com.study.my_spring_study_diary.auth.exception.InvalidTokenException;
+import com.study.my_spring_study_diary.global.config.properties.JwtProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,14 @@ class JwtTokenProviderTest {
 
     @BeforeEach
     void setUP() {
-        tokenProvider = new JwtTokenProvider(SECRET_KEY, 1800, 604800);
+        // 테스트용 JwtProperties 생성
+        JwtProperties jwtProperties = new JwtProperties();
+        jwtProperties.setSecret(SECRET_KEY);
+        jwtProperties.setAccessTokenValidity(1800);
+        jwtProperties.setRefreshTokenExpiry(604800);
+
+        tokenProvider = new JwtTokenProvider(jwtProperties);
+        tokenProvider.init();  // @PostConstruct 수동 호출
     }
 
     @Test
@@ -52,12 +60,19 @@ class JwtTokenProviderTest {
     void validateToken_expired() {
         // TODO: 만료 시간이 0인 TokenProvider를 생성하고 토큰 검증 테스트
         // Given
-        JwtTokenProvider validateTokenExpriedProvider = new JwtTokenProvider(SECRET_KEY, 0, 0);
+        JwtProperties expiredProps = new JwtProperties();
+        expiredProps.setSecret(SECRET_KEY);
+        expiredProps.setAccessTokenValidity(0);
+        expiredProps.setRefreshTokenExpiry(0);
+
+        JwtTokenProvider expiredProvider = new JwtTokenProvider(expiredProps);
+        expiredProvider.init();
+
         String username = "testUser";
         String role = "ROLE_USER";
 
         // When
-        String token = validateTokenExpriedProvider.generateAccessToken(username, role);
+        String token = expiredProvider.generateAccessToken(username, role);
 
         // Then
         assertThatThrownBy(() -> tokenProvider.validateToken(token))
@@ -70,12 +85,19 @@ class JwtTokenProviderTest {
     void validateToken_invalidSignature() {
         // TODO: 다른 secret key로 생성된 토큰 검증 시 예외 발생 테스트
         // Given
-        JwtTokenProvider validTokenWrongSignedProvider = new JwtTokenProvider("aweriuasdifug12312311231231qprjaoisdfjklarewqerasuhiae", 1800, 604800);
+        JwtProperties wrongProps = new JwtProperties();
+        wrongProps.setSecret("aweriuasdifug12312311231231qprjaoisdfjklarewqerasuhiae");
+        wrongProps.setAccessTokenValidity(1800);
+        wrongProps.setRefreshTokenExpiry(604800);
+
+        JwtTokenProvider wrongProvider = new JwtTokenProvider(wrongProps);
+        wrongProvider.init();
+
         String username = "testUser";
         String role = "ROLE_USER";
 
         // When
-        String token = validTokenWrongSignedProvider.generateAccessToken(username, role);
+        String token = wrongProvider.generateAccessToken(username, role);
 
         // Then
         assertThatThrownBy(() -> tokenProvider.validateToken(token))

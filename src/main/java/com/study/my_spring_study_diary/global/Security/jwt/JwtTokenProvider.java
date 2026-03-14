@@ -2,9 +2,12 @@ package com.study.my_spring_study_diary.global.Security.jwt;
 
 import com.study.my_spring_study_diary.auth.exception.ExpiredTokenException;
 import com.study.my_spring_study_diary.auth.exception.InvalidTokenException;
+import com.study.my_spring_study_diary.global.config.properties.JwtProperties;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -24,21 +27,25 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider {
 
-    private final SecretKey secretKey;
-    private final long accessTokenValidityInMilliseconds;
-    private final long refreshTokenValidityInMilliseconds;
+    private final JwtProperties jwtProperties;
 
-    public JwtTokenProvider(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.access-token-validity}") long accessTokenValidity,
-            @Value("${jwt.refresh-token-validity}") long refreshTokenValidity) {
+    private SecretKey secretKey;
+    private long accessTokenValidityInMilliseconds;
+    private long refreshTokenValidityInMilliseconds;
 
-        // 설정된 secret 문자열로부터 HMAC-SHA 서명용 SecretKey 생성
-        this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        this.accessTokenValidityInMilliseconds = accessTokenValidity * 1000;   // 초 → 밀리초 변환
-        this.refreshTokenValidityInMilliseconds = refreshTokenValidity * 1000; // 초 → 밀리초 변환
+    @PostConstruct
+    void init() {
+        this.secretKey = Keys.hmacShaKeyFor(
+                jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
+
+        this.accessTokenValidityInMilliseconds =
+                jwtProperties.getAccessTokenValidity() * 1000;
+
+        this.refreshTokenValidityInMilliseconds =
+                jwtProperties.getRefreshTokenExpiry() * 1000;
     }
 
     /**

@@ -1,8 +1,9 @@
 # 서버 설정
 server:
-  port: 8081
+  port: ${APP_PORT:8081}
   servlet:
     context-path:
+
 spring:
   application:
     name: my-spring-study-diary
@@ -10,8 +11,8 @@ spring:
   # MySQL 데이터베이스 설정
   datasource:
     url: jdbc:mysql://localhost:3306/diary_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: root
-    password: rootpass
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:rootpass}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       connection-timeout: 30000
@@ -89,13 +90,13 @@ resilience4j:
     instances:
       discordWebhook:
         # slidingWindowSize: 실패율 계산에 사용할 최근 호출 수
-        sliding-window-size: 10
+        sliding-window-size: 20
         # failureRateThreshold: 서킷을 OPEN으로 전환하는 실패율 (%)
         # 최근 10번 중 50%(5번) 이상 실패하면 서킷 OPEN
         failure-rate-threshold: 50
         # waitDurationInOpenState: OPEN 상태에서 HALF_OPEN으로 전환까지의 대기 시간
-        wait-duration-in-open-state: 10s
+        wait-duration-in-open-state: 30s
         # permittedNumberOfCallsInHalfOpenState: HALF_OPEN에서 테스트할 요청 수
         permitted-number-of-calls-in-half-open-state: 3
         # minimumNumberOfCalls: 실패율 계산을 시작하기 위한 최소 호출 수
-        minimum-number-of-calls: 5
+        minimum-number-of-calls: 10
