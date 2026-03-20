@@ -35,9 +35,8 @@ dependencies {
 
 	// MySQL 및 JDBC 의존성, H2
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-	implementation 'mysql:mysql-connector-java:8.0.33'
-	implementation 'org.springframework.boot:spring-boot-h2console'
-	runtimeOnly 'com.h2database:h2'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	runtimeOnly 'com.mysql:mysql-connector-j'
 
 	// Validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'

@@ -35,6 +35,18 @@ spring:
     basename: messages/validation
     encoding: UTF-8
 
+  # JPA
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        default_batch_fetch_size: 100
+    open-in-view: false
+
 # 로깅 설정
 logging:
   level:

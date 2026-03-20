@@ -1,11 +1,16 @@
 package com.study.my_spring_study_diary.study_log.entity;
 
 
+import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "study_logs")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -13,49 +18,39 @@ import java.time.LocalDateTime;
 @Builder
 public class StudyLog {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, length = 200)
     private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String content;
-    private Category category;
-    private Understanding understanding;
-    private Integer studyTime;
+
+    @Column(name = "study_date", nullable = false)
     private LocalDate studyDate;
 
-    @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "study_time", nullable = false)
+    private Integer studyTime;
 
-    @Builder.Default
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50)
+    private Category category;
 
-    // Individual update methods for MapStruct
-    public void updateTitle(String title) {
-        this.title = title;
-        this.updatedAt = LocalDateTime.now();
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50)
+    private Understanding understanding;
 
-    public void updateContent(String content) {
-        this.content = content;
-        this.updatedAt = LocalDateTime.now();
-    }
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
-    public void updateCategory(Category category) {
-        this.category = category;
-        this.updatedAt = LocalDateTime.now();
-    }
+    @Column(name = "updated_at")
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
-    public void updateUnderstanding(Understanding understanding) {
-        this.understanding = understanding;
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public void updateStudyTime(Integer studyTime) {
-        this.studyTime = studyTime;
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public void updateStudyDate(LocalDate studyDate) {
-        this.studyDate = studyDate;
-        this.updatedAt = LocalDateTime.now();
-    }
+    @Version
+    private Long version;
 }
 
