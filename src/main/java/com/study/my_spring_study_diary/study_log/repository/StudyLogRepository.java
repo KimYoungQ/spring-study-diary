@@ -41,8 +41,6 @@ public interface StudyLogRepository extends JpaRepository<StudyLog, Long> {
             @Param("endDate") LocalDate endDate
     );
 
-    Optional<StudyLog> findById(Long id);
-
     // 벌크 업데이트
     @Modifying
     @Query("UPDATE StudyLog s SET s.studyTime = :hours WHERE s.id = :id")
@@ -53,7 +51,4 @@ public interface StudyLogRepository extends JpaRepository<StudyLog, Long> {
 
     // 날짜별 학습 일지 조회
     List<StudyLog> findByStudyDate(LocalDate date);
-
-
-
 }
