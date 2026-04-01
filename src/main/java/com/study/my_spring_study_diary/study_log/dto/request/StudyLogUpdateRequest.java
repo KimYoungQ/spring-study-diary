@@ -15,8 +15,6 @@ import java.time.LocalDate;
  * null이면 기존 값을 유지합니다.
  */
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 public class StudyLogUpdateRequest {
 
