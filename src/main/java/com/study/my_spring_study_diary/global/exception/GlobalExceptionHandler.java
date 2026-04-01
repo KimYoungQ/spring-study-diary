@@ -2,6 +2,7 @@ package com.study.my_spring_study_diary.global.exception;
 
 import com.study.my_spring_study_diary.global.common.ApiResponse;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -18,6 +20,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException e) {
 
         ErrorCode errorCode = e.getErrorCode();
+        log.warn("비즈니스 예외 발생: [{}] {}", errorCode.getCode(), e.getMessage());
 
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
@@ -44,6 +47,9 @@ public class GlobalExceptionHandler {
                 .map(entry -> entry.getKey() + ": " + entry.getValue())
                 .collect(Collectors.joining(", "));
 
+        log.warn("입력값 검증 실패: {}", message);
+        log.debug("검증 오류 상세: {}", errors);
+
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
                 .body(ApiResponse.error(errorCode.getCode(), message));
@@ -63,6 +69,8 @@ public class GlobalExceptionHandler {
                 .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
                 .collect(Collectors.joining(", "));
 
+        log.warn("제약 조건 검증 실패: {}", message);
+
         return ResponseEntity
                 .badRequest()
                 .body(ApiResponse.error(errorCode.getCode(), message));
@@ -77,6 +85,7 @@ public class GlobalExceptionHandler {
             IllegalArgumentException e) {
 
         ErrorCode errorCode = ErrorCode.INVALID_INPUT;
+        log.warn("잘못된 인자: {}", e.getMessage());
 
         return ResponseEntity
                 .badRequest()
@@ -89,8 +98,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGeneral(Exception e) {
 
-        // Log the error for debugging
-        e.printStackTrace();
+        log.error("예상치 못한 오류 발생: {}", e.getMessage(), e);
 
         ErrorCode errorCode = ErrorCode.INTERNAL_ERROR;
 
