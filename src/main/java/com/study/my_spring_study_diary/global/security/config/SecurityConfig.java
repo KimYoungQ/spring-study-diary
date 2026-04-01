@@ -1,7 +1,7 @@
-package com.study.my_spring_study_diary.global.Security.config;
+package com.study.my_spring_study_diary.global.security.config;
 
-import com.study.my_spring_study_diary.global.Security.jwt.JwtAuthenticationEntryPoint;
-import com.study.my_spring_study_diary.global.Security.jwt.JwtAuthenticationFilter;
+import com.study.my_spring_study_diary.global.security.jwt.JwtAuthenticationEntryPoint;
+import com.study.my_spring_study_diary.global.security.jwt.JwtAuthenticationFilter;
 import com.study.my_spring_study_diary.global.filter.MdcLoggingFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

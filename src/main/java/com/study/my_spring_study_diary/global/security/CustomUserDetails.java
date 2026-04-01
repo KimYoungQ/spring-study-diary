@@ -1,4 +1,4 @@
-package com.study.my_spring_study_diary.global.Security;
+package com.study.my_spring_study_diary.global.security;
 
 import com.study.my_spring_study_diary.auth.entity.User;
 import lombok.AllArgsConstructor;
@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor

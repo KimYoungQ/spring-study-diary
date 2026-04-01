@@ -13,7 +13,7 @@ import com.study.my_spring_study_diary.auth.entity.UserRole;
 import com.study.my_spring_study_diary.auth.exception.AuthException;
 import com.study.my_spring_study_diary.auth.exception.InvalidTokenException;
 import com.study.my_spring_study_diary.event.auth.UserRegisteredEvent;
-import com.study.my_spring_study_diary.global.Security.jwt.JwtTokenProvider;
+import com.study.my_spring_study_diary.global.security.jwt.JwtTokenProvider;
 import com.study.my_spring_study_diary.study_log.exception.DuplicateResourceException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.study.my_spring_study_diary.global.Security.jwt;
+package com.study.my_spring_study_diary.global.security.jwt;
 
 import com.study.my_spring_study_diary.auth.exception.ExpiredTokenException;
 import com.study.my_spring_study_diary.auth.exception.InvalidTokenException;

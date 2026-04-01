@@ -1,4 +1,4 @@
-package com.study.my_spring_study_diary.global.Security;
+package com.study.my_spring_study_diary.global.security;
 
 import com.study.my_spring_study_diary.auth.exception.AuthException;
 import org.springframework.security.core.Authentication;
