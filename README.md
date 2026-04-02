@@ -63,13 +63,8 @@ src/main/java/com/study/my_spring_study_diary/
 
 ```bash
 cp .env.example .env
-# .env 파일을 열어서 실제 비밀번호 등을 설정
+# .env 파일을 열어서 docker 설정을 위한 MySQL 커넥션 정보 등을 설정
 ```
-
-**필수 환경 변수:**
-- `JWT_SECRET` - JWT 시크릿 키
-- `DISCORD_WEBHOOK_URL` - Discord 웹훅 URL
-- `DISCORD_WEBHOOK_ENABLED` - 웹훅 활성화 여부 (true/false)
 
 ### 2. 데이터베이스 설정
 
