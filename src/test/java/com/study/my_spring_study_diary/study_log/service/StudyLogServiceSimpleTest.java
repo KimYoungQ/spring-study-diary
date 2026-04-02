@@ -9,6 +9,7 @@ import com.study.my_spring_study_diary.study_log.entity.Category;
 import com.study.my_spring_study_diary.study_log.entity.StudyLog;
 import com.study.my_spring_study_diary.study_log.entity.Understanding;
 import com.study.my_spring_study_diary.discord.service.DiscordNotificationService;
+import com.study.my_spring_study_diary.study_log.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -113,8 +114,8 @@ class StudyLogServiceSimpleTest {
         }
 
         @Test
-        @DisplayName("메일 발송 이벤트 발행 확인")
-        void createStudyLog_sendEmail() {
+        @DisplayName("이벤트 발행 확인")
+        void createStudyLog_publishEvent() {
 
             when(studyLogMapper.toEntity(any(StudyLogCreateRequest.class))).thenReturn(testStudyLog);
             when(studyLogDao.save(any(StudyLog.class))).thenReturn(testStudyLog);
@@ -126,22 +127,37 @@ class StudyLogServiceSimpleTest {
         }
     }
 
-    @Test
-    @DisplayName("ID로 학습 기록 조회 - 성공")
-    void getStudyLogById_Success() {
-        // Given
-        when(studyLogDao.findById(1L)).thenReturn(Optional.of(testStudyLog));
-        when(studyLogMapper.toResponse(testStudyLog)).thenReturn(testResponse);
+    @Nested
+    @DisplayName("학습 기록 조회")
+    class findStudyLog {
+        @Test
+        @DisplayName("ID로 조회 - 성공")
+        void getStudyLogById_Success() {
+            // Given
+            when(studyLogDao.findById(1L)).thenReturn(Optional.of(testStudyLog));
+            when(studyLogMapper.toResponse(testStudyLog)).thenReturn(testResponse);
 
-        // When
-        StudyLogResponse response = studyLogService.getStudyLogById(1L);
+            // When
+            StudyLogResponse response = studyLogService.getStudyLogById(1L);
 
-        // Then
-        assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(1L);
-        assertThat(response.getTitle()).isEqualTo("Test Title");
-        assertThat(response.getCategory()).isEqualTo("SPRING");
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getId()).isEqualTo(1L);
+            assertThat(response.getTitle()).isEqualTo("Test Title");
+            assertThat(response.getCategory()).isEqualTo("SPRING");
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 ID로 조회 - 실패")
+        void getStudyLogById_throwsException() {
+
+            // Given
+            when(studyLogDao.findById(999L)).thenReturn(Optional.empty());
+
+            // When & Then
+            assertThatThrownBy(() -> studyLogService.getStudyLogById(999L))
+                    .isInstanceOf(ResourceNotFoundException.class)
+                    .hasMessageContaining("not found with ID:");
+        }
     }
-
-
 }
