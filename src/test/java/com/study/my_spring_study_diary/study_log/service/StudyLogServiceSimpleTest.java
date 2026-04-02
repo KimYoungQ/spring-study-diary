@@ -1,5 +1,6 @@
 package com.study.my_spring_study_diary.study_log.service;
 
+import com.study.my_spring_study_diary.event.study.StudyLogCreatedEvent;
 import com.study.my_spring_study_diary.global.mapper.StudyLogMapper;
 import com.study.my_spring_study_diary.study_log.dao.StudyLogDao;
 import com.study.my_spring_study_diary.study_log.dto.request.StudyLogCreateRequest;
@@ -10,6 +11,7 @@ import com.study.my_spring_study_diary.study_log.entity.Understanding;
 import com.study.my_spring_study_diary.discord.service.DiscordNotificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,7 +24,9 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,6 +50,7 @@ class StudyLogServiceSimpleTest {
 
     private StudyLog testStudyLog;
     private StudyLogResponse testResponse;
+    private StudyLogCreateRequest testRequest;
 
     @BeforeEach
     void setUp() {
@@ -76,6 +81,49 @@ class StudyLogServiceSimpleTest {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
+
+        // 테스트용 request 생성
+        testRequest = StudyLogCreateRequest.builder()
+                .title("New Study")
+                .content("New Content for testing study log creation")
+                .category("SPRING")
+                .understanding("VERY_GOOD")
+                .studyTime(90)
+                .studyDate(LocalDate.now())
+                .build();
+    }
+
+    @Nested
+    @DisplayName("학습 기록 생성")
+    class createStudyLog {
+        @Test
+        @DisplayName("생성 성공")
+        void createStudyLog_Success() {
+            // Given
+            when(studyLogMapper.toEntity(any(StudyLogCreateRequest.class))).thenReturn(testStudyLog);
+            when(studyLogDao.save(any(StudyLog.class))).thenReturn(testStudyLog);
+            when(studyLogMapper.toResponse(any(StudyLog.class))).thenReturn(testResponse);
+
+            // When
+            StudyLogResponse response = studyLogService.createStudyLog(testRequest);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getTitle()).isEqualTo("Test Title");
+        }
+
+        @Test
+        @DisplayName("메일 발송 이벤트 발행 확인")
+        void createStudyLog_sendEmail() {
+
+            when(studyLogMapper.toEntity(any(StudyLogCreateRequest.class))).thenReturn(testStudyLog);
+            when(studyLogDao.save(any(StudyLog.class))).thenReturn(testStudyLog);
+            when(studyLogMapper.toResponse(any(StudyLog.class))).thenReturn(testResponse);
+
+            studyLogService.createStudyLog(testRequest);
+
+            verify(eventPublisher).publishEvent(any(StudyLogCreatedEvent.class));
+        }
     }
 
     @Test
@@ -95,27 +143,5 @@ class StudyLogServiceSimpleTest {
         assertThat(response.getCategory()).isEqualTo("SPRING");
     }
 
-    @Test
-    @DisplayName("학습 기록 생성 - 성공")
-    void createStudyLog_Success() {
-        // Given
-        StudyLogCreateRequest request = new StudyLogCreateRequest();
-        request.setTitle("New Study");
-        request.setContent("New Content for testing study log creation");
-        request.setCategory("SPRING");
-        request.setUnderstanding("VERY_GOOD");
-        request.setStudyTime(90);
-        request.setStudyDate(LocalDate.now());
 
-        when(studyLogMapper.toEntity(any(StudyLogCreateRequest.class))).thenReturn(testStudyLog);
-        when(studyLogDao.save(any(StudyLog.class))).thenReturn(testStudyLog);
-        when(studyLogMapper.toResponse(any(StudyLog.class))).thenReturn(testResponse);
-
-        // When
-        StudyLogResponse response = studyLogService.createStudyLog(request);
-
-        // Then
-        assertThat(response).isNotNull();
-        assertThat(response.getTitle()).isEqualTo("Test Title");
-    }
 }
