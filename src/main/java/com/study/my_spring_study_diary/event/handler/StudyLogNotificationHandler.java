@@ -1,6 +1,7 @@
 package com.study.my_spring_study_diary.event.handler;
 
 
+import com.study.my_spring_study_diary.discord.service.DiscordNotificationService;
 import com.study.my_spring_study_diary.event.study.StudyLogCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,8 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 @RequiredArgsConstructor
 public class StudyLogNotificationHandler {
+
+    private final DiscordNotificationService discordNotificationService;
 
     // 실제로는 EmailService, SmsService 등을 주입받아 사용
     // private final EmailService emailService;
@@ -45,6 +48,9 @@ public class StudyLogNotificationHandler {
             //     String.format("오늘도 열심히 공부하셨네요! '%s' 학습을 %d분간 진행하셨습니다.",
             //         event.getTitle(), event.getStudyTime())
             // );
+
+            // 3. Discord 알림 발송
+            discordNotificationService.sendStudyLogCreatedNotification(event);
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

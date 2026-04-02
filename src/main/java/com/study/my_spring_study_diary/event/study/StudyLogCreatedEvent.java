@@ -15,6 +15,7 @@ public class StudyLogCreatedEvent {
 
     private final Long studyLogId;
     private final String title;
+    private final String content;
     private final Category category;
     private final Understanding understanding;
     private final Integer studyTime;  // 분 단위
@@ -32,11 +33,11 @@ public class StudyLogCreatedEvent {
         return new StudyLogCreatedEvent(
                 studyLog.getId(),
                 studyLog.getTitle(),
+                studyLog.getContent(),
                 studyLog.getCategory(),
                 studyLog.getUnderstanding(),
                 studyLog.getStudyTime(),
                 studyLog.getStudyDate(),
-                studyLog.getCreatedAt()
-        );
+                studyLog.getCreatedAt());
     }
 }

@@ -48,7 +48,8 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/signup",
                                 "/api/auth/refresh",
-                                "/api/auth/logout"
+                                "/api/auth/logout",
+                                "/api/discord/test"
                         ).permitAll()
 
                         // Swagger/OpenAPI endpoints

@@ -1,6 +1,7 @@
 package com.study.my_spring_study_diary.discord.service;
 
 import com.study.my_spring_study_diary.discord.dto.DiscordWebhookMessage;
+import com.study.my_spring_study_diary.event.study.StudyLogCreatedEvent;
 import com.study.my_spring_study_diary.study_log.entity.StudyLog;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,13 +36,7 @@ public class DiscordNotificationService {
     private static final int COLOR_WARNING = 0xFFD700;  // 금색
     private static final int COLOR_ERROR = 0xFF0000;    // 빨간색
 
-    /**
-     * StudyLog 생성 알림 (비동기)
-     *
-     * @Async를 사용하여 메인 로직을 블로킹하지 않음
-     */
-    @Async
-    public void sendStudyLogCreatedNotification(StudyLog studyLog) {
+    public void sendStudyLogCreatedNotification(StudyLogCreatedEvent event) {
         if (!webhookEnabled) {
             log.debug("Discord webhook is disabled");
             return;
@@ -49,17 +44,16 @@ public class DiscordNotificationService {
 
         try {
             DiscordWebhookMessage message = createStudyLogEmbed(
-                    studyLog,
+                    event,
                     "새로운 학습 일지가 작성되었습니다! ✨",
                     COLOR_SUCCESS
             );
 
             // 별도 Bean을 통해 호출 → 프록시를 거치므로 @CircuitBreaker 정상 작동
             webhookSender.send(message);
-            log.info("Discord notification sent for StudyLog ID: {}", studyLog.getId());
+            log.info("Discord 알림이 발송 되었습니다! ID: {}", event.getStudyLogId());
 
         } catch (Exception e) {
-            // Discord 실패가 메인 로직에 영향 X
             log.error("Failed to send Discord notification", e);
         }
     }
@@ -67,7 +61,7 @@ public class DiscordNotificationService {
     /**
      * StudyLog를 Discord Embed로 변환
      */
-    private DiscordWebhookMessage createStudyLogEmbed(StudyLog studyLog,
+    private DiscordWebhookMessage createStudyLogEmbed(StudyLogCreatedEvent event,
                                                       String title,
                                                       int color) {
         List<DiscordWebhookMessage.Field> fields = new ArrayList<>();
@@ -75,32 +69,32 @@ public class DiscordNotificationService {
         // 필드 추가
         fields.add(DiscordWebhookMessage.Field.builder()
                 .name("📚 제목")
-                .value(studyLog.getTitle())
+                .value(event.getTitle())
                 .inline(false)
                 .build());
 
         fields.add(DiscordWebhookMessage.Field.builder()
                 .name("📂 카테고리")
-                .value(studyLog.getCategory().getIcon() + " " +
-                        studyLog.getCategory().name())
+                .value(event.getCategory().getIcon() + " " +
+                        event.getCategory().name())
                 .inline(true)
                 .build());
 
         fields.add(DiscordWebhookMessage.Field.builder()
                 .name("💡 이해도")
-                .value(studyLog.getUnderstanding().getEmoji() + " " +
-                        studyLog.getUnderstanding().name())
+                .value(event.getUnderstanding().getEmoji() + " " +
+                        event.getUnderstanding().name())
                 .inline(true)
                 .build());
 
         fields.add(DiscordWebhookMessage.Field.builder()
                 .name("⏱️ 학습 시간")
-                .value(studyLog.getStudyTime() + "분")
+                .value(event.getStudyTime() + "분")
                 .inline(true)
                 .build());
 
         // 내용 (1000자 제한)
-        String content = studyLog.getContent();
+        String content = event.getContent();
         if (content != null && content.length() > 1000) {
             content = content.substring(0, 997) + "...";
         }
@@ -116,7 +110,7 @@ public class DiscordNotificationService {
                 .color(color)
                 .fields(fields)
                 .footer(DiscordWebhookMessage.Footer.builder()
-                        .text("Study Log ID: " + studyLog.getId())
+                        .text("Study Log ID: " + event.getStudyLogId())
                         .build())
                 .timestamp(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
                 .build();

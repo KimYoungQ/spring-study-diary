@@ -80,8 +80,8 @@ springdoc:
 discord:
   webhook:
     # 환경변수로 관리 (보안)
-    url: ${DISCORD_WEBHOOK_URL:https://discord.com/api/webhooks/1481275038643785912/a-lDft0Nq8u5B0_9P0HUECdfLkURj9VRR6-ZyRyx9zHTv1VroJZ9tbYOvELAP5lniCnR1}
-    enabled: ${DISCORD_WEBHOOK_ENABLED:false}
+    url: ${DISCORD_WEBHOOK_URL:https://discord.com/api/webhooks/1481275038643785912/a-lDft0Nq8u5B0_9P0HUECdfLkURj9VRR6-ZyRyx9zHTv1VroJZ9tbYOvELAP5lniCnR}
+    enabled: ${DISCORD_WEBHOOK_ENABLED:true}
     username: Study Log Bot
     avatar-url: https://i.imgur.com/AfFp7pu.png
 
