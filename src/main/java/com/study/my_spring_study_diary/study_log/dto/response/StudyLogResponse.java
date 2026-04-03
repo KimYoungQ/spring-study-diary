@@ -2,11 +2,12 @@ package com.study.my_spring_study_diary.study_log.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Value;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Getter
+@Value
 @Builder
 public class StudyLogResponse {
 

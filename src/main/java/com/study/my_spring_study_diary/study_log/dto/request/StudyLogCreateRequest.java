@@ -8,10 +8,10 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class StudyLogCreateRequest {
 
     @NotBlank(message = "제목은 필수입니다")

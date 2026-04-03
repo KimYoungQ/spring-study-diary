@@ -1,10 +1,7 @@
 package com.study.my_spring_study_diary.auth.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * Refresh Token Request DTO
@@ -14,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class TokenRefreshRequest {
 
     @NotBlank(message = "Refresh token is required")

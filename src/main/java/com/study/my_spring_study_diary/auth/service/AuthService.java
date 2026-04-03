@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AuthService {
 
     private final UserDao userDao;
@@ -57,6 +58,7 @@ public class AuthService {
      * User login
      * POST /api/auth/login
      */
+    @Transactional
     public LoginResponse login(@Valid LoginRequest request) {
         try {
             log.info("Login attempt for user: {}", request.getUsername());

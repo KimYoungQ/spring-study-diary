@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class StudyLogService {
 
     // 의존성 주입: Repository를 주입받음
@@ -216,6 +217,7 @@ public class StudyLogService {
      * @param request 수정 요청 데이터
      * @return 수정된 학습 일지 응답
      */
+    @Transactional
     public StudyLogResponse updateStudyLog(Long id, StudyLogUpdateRequest request) {
 
         // 1. 기존 학습 일지 조회
@@ -242,6 +244,7 @@ public class StudyLogService {
      * @return 삭제 결과 응답
      * @throws ResourceNotFoundException 해당 ID의 학습 일지가validationStudyLogById 없는 경우
      */
+    @Transactional
     public StudyLogDeleteResponse deleteStudyLog(Long id) {
 
         studyLogDao.findById(id)

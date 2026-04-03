@@ -1,17 +1,12 @@
 package com.study.my_spring_study_diary.auth.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * Token Response DTO
  * Contains new access token and refresh token
  */
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@Value
 @Builder
 public class TokenRefreshResponse {
 

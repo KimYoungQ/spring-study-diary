@@ -16,6 +16,9 @@ import java.time.LocalDate;
  */
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@ToString
 public class StudyLogUpdateRequest {
 
     @Size(min = 2, max = 100, message = "제목은 2자 이상 100자 이하여야 합니다")
