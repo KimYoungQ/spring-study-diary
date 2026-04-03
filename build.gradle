@@ -75,6 +75,7 @@ dependencies {
 
 	// 이 하나가 JUnit 5 + Mockito + AssertJ + Spring Test를 모두 포함
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 
 	// 인메모리 DB (통합 테스트에서 실제 DB 대신 사용)
 	testRuntimeOnly 'com.h2database:h2'
