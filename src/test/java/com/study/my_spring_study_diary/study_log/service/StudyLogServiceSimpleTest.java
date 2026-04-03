@@ -22,6 +22,8 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -111,6 +113,10 @@ class StudyLogServiceSimpleTest {
             // Then
             assertThat(response).isNotNull();
             assertThat(response.getTitle()).isEqualTo("Test Title");
+
+            verify(studyLogMapper).toEntity(any(StudyLogCreateRequest.class));
+            verify(studyLogDao).save(any(StudyLog.class));
+            verify(studyLogMapper).toResponse(any(StudyLog.class));
         }
 
         @Test
@@ -128,8 +134,8 @@ class StudyLogServiceSimpleTest {
     }
 
     @Nested
-    @DisplayName("학습 기록 조회")
-    class findStudyLog {
+    @DisplayName("ID로 학습 기록 조회")
+    class findStudyLogByID {
         @Test
         @DisplayName("ID로 조회 - 성공")
         void getStudyLogById_Success() {
@@ -145,6 +151,9 @@ class StudyLogServiceSimpleTest {
             assertThat(response.getId()).isEqualTo(1L);
             assertThat(response.getTitle()).isEqualTo("Test Title");
             assertThat(response.getCategory()).isEqualTo("SPRING");
+
+            verify(studyLogDao).findById(1L);
+            verify(studyLogMapper).toResponse(testStudyLog);
         }
 
         @Test
@@ -158,6 +167,54 @@ class StudyLogServiceSimpleTest {
             assertThatThrownBy(() -> studyLogService.getStudyLogById(999L))
                     .isInstanceOf(ResourceNotFoundException.class)
                     .hasMessageContaining("not found with ID:");
+        }
+    }
+
+    @Nested
+    @DisplayName("전체 학습 기록 조회")
+    class findStudyLogByAll {
+
+        @Test
+        @DisplayName("전체 조회 성공")
+        void getAllStudyLogs_Success() {
+
+            // Given
+            List<StudyLog> studyLogAll = new ArrayList<>();
+            studyLogAll.add(testStudyLog);
+            studyLogAll.add(testStudyLog);
+
+            List<StudyLogResponse> studyLogAllResponse = new ArrayList<>();
+            studyLogAllResponse.add(testResponse);
+            studyLogAllResponse.add(testResponse);
+
+            when(studyLogDao.findAll()).thenReturn(studyLogAll);
+            when(studyLogMapper.toResponseList(studyLogAll)).thenReturn(studyLogAllResponse);
+
+            // When
+            List<StudyLogResponse> response = studyLogService.getAllStudyLogs();
+
+            // Then
+            assertThat(response).hasSize(2);
+            assertThat(response.get(0).getTitle()).isEqualTo("Test Title");
+            assertThat(response.get(0).getCategory()).isEqualTo("SPRING");
+
+            verify(studyLogDao).findAll();
+            verify(studyLogMapper).toResponseList(studyLogAll);
+        }
+
+        @Test
+        @DisplayName("학습 기록이 없을 때 빈 리스트 반환")
+        void getAllStudyLogs_ReturnsEmptyList() {
+
+            // Given
+            when(studyLogDao.findAll()).thenReturn(new ArrayList<>());
+            when(studyLogMapper.toResponseList(new ArrayList<>())).thenReturn(new ArrayList<>());
+
+            // When
+            List<StudyLogResponse> response = studyLogService.getAllStudyLogs();
+
+            // Then
+            assertThat(response).isEmpty();
         }
     }
 }
