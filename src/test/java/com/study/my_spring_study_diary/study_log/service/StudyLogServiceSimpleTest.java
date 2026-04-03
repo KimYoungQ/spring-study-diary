@@ -4,12 +4,15 @@ import com.study.my_spring_study_diary.event.study.StudyLogCreatedEvent;
 import com.study.my_spring_study_diary.global.mapper.StudyLogMapper;
 import com.study.my_spring_study_diary.study_log.dao.StudyLogDao;
 import com.study.my_spring_study_diary.study_log.dto.request.StudyLogCreateRequest;
+import com.study.my_spring_study_diary.study_log.dto.request.StudyLogUpdateRequest;
 import com.study.my_spring_study_diary.study_log.dto.response.StudyLogResponse;
 import com.study.my_spring_study_diary.study_log.entity.Category;
 import com.study.my_spring_study_diary.study_log.entity.StudyLog;
 import com.study.my_spring_study_diary.study_log.entity.Understanding;
 import com.study.my_spring_study_diary.discord.service.DiscordNotificationService;
+import com.study.my_spring_study_diary.study_log.exception.InvalidPageRequestException;
 import com.study.my_spring_study_diary.study_log.exception.ResourceNotFoundException;
+import com.study.my_spring_study_diary.global.common.Page;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -215,6 +218,150 @@ class StudyLogServiceSimpleTest {
 
             // Then
             assertThat(response).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("페이징 조회")
+    class getStudyLogsWithPaging {
+
+        @Test
+        @DisplayName("정상 페이징 조회")
+        void getStudyLogsWithPaging_Success() {
+            // Given
+            int page = 0, size = 10;
+            List<StudyLog> studyLogs = new ArrayList<>();
+            studyLogs.add(testStudyLog);
+            studyLogs.add(testStudyLog);
+            Page<StudyLog> studyLogPage = new Page<>(studyLogs, page, size, 2L);
+
+            when(studyLogDao.findAllWithPaging(page, size)).thenReturn(studyLogPage);
+            when(studyLogMapper.toResponse(testStudyLog)).thenReturn(testResponse);
+
+            // When
+            Page<StudyLogResponse> result = studyLogService.getStudyLogsWithPaging(page, size);
+
+            // Then
+            assertThat(result.getContent()).hasSize(2);
+            assertThat(result.getPage()).isEqualTo(0);
+            assertThat(result.getSize()).isEqualTo(10);
+            assertThat(result.getTotalElements()).isEqualTo(2L);
+
+            verify(studyLogDao).findAllWithPaging(page, size);
+        }
+
+        @Test
+        @DisplayName("페이지 범위 초과 시 예외처리")
+        void getStudyLogsWithPaging_throwsExceptionWhenPageExceedsTotalPages() {
+            // Given
+            int page = 5, size = 10;
+            // totalElements=10, size=10 → totalPages=1 이므로 page=5는 범위 초과
+            Page<StudyLog> studyLogPage = new Page<>(new ArrayList<>(), page, size, 10L);
+
+            when(studyLogDao.findAllWithPaging(page, size)).thenReturn(studyLogPage);
+
+            // When & Then
+            assertThatThrownBy(() -> studyLogService.getStudyLogsWithPaging(page, size))
+                    .isInstanceOf(InvalidPageRequestException.class);
+        }
+
+        @Test
+        @DisplayName("size가 MAX_PAGE_SIZE(100) 초과 시 100으로 클램핑")
+        void getStudyLogsWithPaging_clampsSizeToMax() {
+            // Given
+            int page = 0, oversizedSize = 200, clampedSize = 100;
+            Page<StudyLog> studyLogPage = new Page<>(List.of(testStudyLog), page, clampedSize, 1L);
+
+            when(studyLogDao.findAllWithPaging(page, clampedSize)).thenReturn(studyLogPage);
+            when(studyLogMapper.toResponse(testStudyLog)).thenReturn(testResponse);
+
+            // When
+            Page<StudyLogResponse> result = studyLogService.getStudyLogsWithPaging(page, oversizedSize);
+
+            // Then
+            assertThat(result.getSize()).isEqualTo(clampedSize);
+            verify(studyLogDao).findAllWithPaging(page, clampedSize);
+        }
+
+        @Test
+        @DisplayName("size가 0 이하일 때 1로 클램핑")
+        void getStudyLogsWithPaging_clampsSizeToMin() {
+            // Given
+            int page = 0, invalidSize = 0, clampedSize = 1;
+            Page<StudyLog> studyLogPage = new Page<>(List.of(testStudyLog), page, clampedSize, 1L);
+
+            when(studyLogDao.findAllWithPaging(page, clampedSize)).thenReturn(studyLogPage);
+            when(studyLogMapper.toResponse(testStudyLog)).thenReturn(testResponse);
+
+            // When
+            Page<StudyLogResponse> result = studyLogService.getStudyLogsWithPaging(page, invalidSize);
+
+            // Then
+            assertThat(result.getSize()).isEqualTo(clampedSize);
+            verify(studyLogDao).findAllWithPaging(page, clampedSize);
+        }
+    }
+
+    @Nested
+    @DisplayName("학습 기록 수정")
+    class updateStudyLog {
+
+        private StudyLogUpdateRequest updateRequest;
+
+        @BeforeEach
+        void setUpUpdateRequest() {
+            updateRequest = StudyLogUpdateRequest.builder()
+                    .title("Updated Title")
+                    .content("Updated content for testing partial update")
+                    .build();
+        }
+
+        @Test
+        @DisplayName("일부 필드만 수정 성공")
+        void updateStudyLog_Success() {
+            // Given
+            when(studyLogDao.findById(1L)).thenReturn(Optional.of(testStudyLog));
+            when(studyLogDao.update(testStudyLog)).thenReturn(testStudyLog);
+            when(studyLogMapper.toResponse(testStudyLog)).thenReturn(testResponse);
+
+            // When
+            StudyLogResponse response = studyLogService.updateStudyLog(1L, updateRequest);
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.getId()).isEqualTo(1L);
+
+            verify(studyLogDao).findById(1L);
+            verify(studyLogMapper).partialUpdate(updateRequest, testStudyLog);
+            verify(studyLogDao).update(testStudyLog);
+            verify(studyLogMapper).toResponse(testStudyLog);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 ID 수정 시 ResourceNotFoundException")
+        void updateStudyLog_throwsExceptionWhenNotFound() {
+            // Given
+            when(studyLogDao.findById(999L)).thenReturn(Optional.empty());
+
+            // When & Then
+            assertThatThrownBy(() -> studyLogService.updateStudyLog(999L, updateRequest))
+                    .isInstanceOf(ResourceNotFoundException.class);
+
+            verify(studyLogDao).findById(999L);
+        }
+
+        @Test
+        @DisplayName("모든 필드가 null이면 IllegalArgumentException")
+        void updateStudyLog_throwsExceptionWhenAllFieldsAreNull() {
+            // Given
+            StudyLogUpdateRequest emptyRequest = StudyLogUpdateRequest.builder().build();
+
+            when(studyLogDao.findById(1L)).thenReturn(Optional.of(testStudyLog));
+
+            // When & Then
+            assertThatThrownBy(() -> studyLogService.updateStudyLog(1L, emptyRequest))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("수정할 내용이 없습니다.");
         }
     }
 }
