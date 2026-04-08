@@ -650,7 +650,7 @@ public interface StudyLogControllerApi {
     })
     ResponseEntity<ApiResponse<StudyLogResponse>> updateStudyLog(
             @Parameter(description = "수정할 학습 기록 ID", required = true, example = "1")
-            Long id,
+            @Positive(message = "ID는 양수여야 합니다") Long id,
             @RequestBody(
                     description = "학습 기록 수정 요청 데이터",
                     required = true,
@@ -727,6 +727,6 @@ public interface StudyLogControllerApi {
     })
     ResponseEntity<ApiResponse<StudyLogDeleteResponse>> deleteStudyLog(
             @Parameter(description = "삭제할 학습 기록 ID", required = true, example = "1")
-            Long id
+            @Positive(message = "ID는 양수여야 합니다") Long id
     );
 }

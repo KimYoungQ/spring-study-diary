@@ -230,7 +230,7 @@ public class StudyLogController implements StudyLogControllerApi {
     @PutMapping("/{id}")
 
     public ResponseEntity<ApiResponse<StudyLogResponse>> updateStudyLog(
-            @PathVariable Long id,
+            @PathVariable @Positive(message = "ID는 양수여야 합니다") Long id,
             @Valid @RequestBody StudyLogUpdateRequest request) {
 
         log.info("학습 일지 수정 요청: id={}, title={}", id, request.getTitle());
@@ -258,7 +258,8 @@ public class StudyLogController implements StudyLogControllerApi {
      * @return 삭제 결과
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<StudyLogDeleteResponse>> deleteStudyLog(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<StudyLogDeleteResponse>> deleteStudyLog(
+            @PathVariable @Positive(message = "ID는 양수여야 합니다") Long id) {
 
         log.info("학습 일지 삭제 요청: id={}", id);
         try {
